@@ -1,6 +1,14 @@
 "use client";
 
-import { createContext, useCallback, useContext, useMemo, useRef, useState, useTransition } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import type { SavePredictionInput } from "@/lib/validation/prediction";
@@ -19,15 +27,7 @@ export function useGroupSave(): Ctx | null {
   return useContext(GroupSaveCtx);
 }
 
-export function GroupSaveForm({
-  total,
-  savedCount,
-  children,
-}: {
-  total: number;
-  savedCount: number;
-  children: React.ReactNode;
-}) {
+export function GroupSaveForm({ children }: { children: React.ReactNode }) {
   const collectorsRef = useRef(new Map<string, Collector>());
   const [registered, setRegistered] = useState(0);
   const [isPending, startTransition] = useTransition();
@@ -65,15 +65,16 @@ export function GroupSaveForm({
 
   return (
     <GroupSaveCtx.Provider value={ctx}>
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-sm text-muted-foreground">
-          {savedCount}/{total} palpites
-        </span>
-        <Button size="sm" onClick={onSaveAll} disabled={isPending}>
-          {isPending ? "Salvando..." : "Salvar palpites"}
-        </Button>
+      <div className="relative pb-24">
+        {children}
+        <div className="pointer-events-none sticky bottom-4 z-10 mt-4 flex justify-end">
+          <div className="pointer-events-auto rounded-xl bg-card px-3 py-2 shadow-lg ring-1 ring-foreground/10 backdrop-blur-sm">
+            <Button size="sm" onClick={onSaveAll} disabled={isPending}>
+              {isPending ? "Salvando..." : "Salvar palpites"}
+            </Button>
+          </div>
+        </div>
       </div>
-      {children}
     </GroupSaveCtx.Provider>
   );
 }

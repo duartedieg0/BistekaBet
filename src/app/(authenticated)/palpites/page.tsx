@@ -64,7 +64,7 @@ export default async function PalpitesPage({
           </CardContent>
         </Card>
       ) : (
-        <GroupSaveForm total={filtered.length} savedCount={savedCount}>
+        <GroupSaveForm>
           <div className="grid gap-3">
             {filtered.map((m) => (
               <MatchPredictionCard key={m.id} match={m} />
