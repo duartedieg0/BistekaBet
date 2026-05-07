@@ -57,10 +57,7 @@ export function AuthHeader({ profile }: { profile: Profile }) {
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuItem
-            onSelect={(event) => {
-              event.preventDefault();
-              signoutFormRef.current?.requestSubmit();
-            }}
+            onClick={() => signoutFormRef.current?.requestSubmit()}
             className="flex items-center gap-2"
           >
             <LogOut className="size-4" />
