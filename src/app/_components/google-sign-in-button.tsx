@@ -4,7 +4,22 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 
-export function GoogleSignInButton() {
+type Variant = "default" | "accent" | "outline";
+type Size = "default" | "sm" | "lg";
+
+interface Props {
+  variant?: Variant;
+  size?: Size;
+  label?: string;
+  className?: string;
+}
+
+export function GoogleSignInButton({
+  variant = "accent",
+  size = "lg",
+  label = "Entrar com Google",
+  className,
+}: Props) {
   const [supabase] = useState(() => createClient());
   const [pending, setPending] = useState(false);
 
@@ -20,13 +35,19 @@ export function GoogleSignInButton() {
       console.error("OAuth init failed", error);
       setPending(false);
     }
-    // On success the browser navigates to Google; no need to reset pending.
   }
 
   return (
-    <Button size="lg" onClick={handleClick} disabled={pending}>
+    <Button
+      variant={variant}
+      size={size}
+      onClick={handleClick}
+      disabled={pending}
+      className={className}
+      aria-label="Entrar com a conta Google"
+    >
       <GoogleIcon />
-      {pending ? "Redirecionando..." : "Entrar com Google"}
+      {pending ? "Redirecionando..." : label}
     </Button>
   );
 }

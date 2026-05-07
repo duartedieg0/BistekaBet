@@ -1,8 +1,80 @@
+import { CalendarDays, Flame, Trophy } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+
 export default function InicioPage() {
   return (
-    <main className="flex flex-1 flex-col items-center justify-center gap-2 px-6 text-center">
-      <h1 className="text-3xl font-bold">Início</h1>
-      <p className="text-muted-foreground">Em construção.</p>
+    <main className="mx-auto w-full max-w-7xl flex-1 px-6 py-10">
+      <header className="flex flex-wrap items-end justify-between gap-4 pb-8">
+        <div className="flex flex-col gap-1">
+          <p className="text-xs font-semibold uppercase tracking-widest text-primary">
+            Sua rodada
+          </p>
+          <h1 className="font-heading text-4xl tracking-tight sm:text-5xl">
+            Bem-vindo ao bolão
+          </h1>
+          <p className="text-muted-foreground">
+            Confira seus próximos jogos, dê palpite e acompanhe o ranking.
+          </p>
+        </div>
+        <Badge variant="upcoming" className="h-7 px-3 text-xs">
+          Pré-Copa · faltam 31 dias
+        </Badge>
+      </header>
+
+      <section className="grid gap-5 lg:grid-cols-[2fr_1fr]">
+        <Card>
+          <CardHeader className="flex-row items-center justify-between gap-2">
+            <CardTitle className="inline-flex items-center gap-2 font-heading text-xl tracking-wide">
+              <CalendarDays className="size-5 text-primary" />
+              Seus próximos jogos
+            </CardTitle>
+            <Badge variant="secondary">3 abertos</Badge>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-3">
+            <Skeleton className="h-20 w-full rounded-lg" />
+            <Skeleton className="h-20 w-full rounded-lg" />
+            <Skeleton className="h-20 w-full rounded-lg" />
+            <p className="pt-2 text-center text-sm text-muted-foreground">
+              Os jogos da Copa 2026 vão aparecer aqui assim que a tabela for
+              publicada.
+            </p>
+          </CardContent>
+        </Card>
+
+        <div className="flex flex-col gap-5">
+          <Card>
+            <CardHeader>
+              <CardTitle className="inline-flex items-center gap-2 font-heading text-xl tracking-wide">
+                <Trophy className="size-5 text-primary" />
+                Sua posição
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col items-start gap-3">
+              <span className="font-heading text-6xl text-primary tabular leading-none">
+                #—
+              </span>
+              <span className="text-sm text-muted-foreground">
+                Você ainda não palpitou. Comece pela primeira partida para
+                entrar no ranking.
+              </span>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="inline-flex items-center gap-2 font-heading text-xl tracking-wide">
+                <Flame className="size-5 text-primary" />
+                Aposta da rodada
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-24 w-full rounded-lg" />
+            </CardContent>
+          </Card>
+        </div>
+      </section>
     </main>
   );
 }
