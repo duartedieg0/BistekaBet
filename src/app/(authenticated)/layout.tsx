@@ -2,6 +2,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { Profile } from "@/types/profile";
+import { Toaster } from "@/components/ui/sonner";
 import { AuthHeader } from "./_components/auth-header";
 
 export default async function AuthenticatedLayout({
@@ -24,9 +25,10 @@ export default async function AuthenticatedLayout({
   if (!profile) redirect("/?error=profile");
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col bg-background">
       <AuthHeader profile={profile} />
       <div className="flex-1">{children}</div>
+      <Toaster richColors position="top-right" />
     </div>
   );
 }

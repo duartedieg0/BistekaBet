@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { STAGES, type Stage } from "@/lib/types/match";
 import { StageTabs } from "./_components/stage-tabs";
+import { MatchPredictionCard } from "./_components/match-prediction-card";
 import { getMatchesWithPredictions } from "./_lib/queries";
 
 export default async function PalpitesPage({
@@ -33,9 +34,11 @@ export default async function PalpitesPage({
       {filtered.length === 0 ? (
         <p className="text-muted-foreground">Nenhum jogo disponível ainda.</p>
       ) : (
-        <pre className="text-xs bg-muted p-3 rounded">
-          {JSON.stringify(filtered.map((m) => ({ id: m.id, hp: m.home_team?.code, ap: m.away_team?.code, k: m.kickoff_at, p: m.prediction })), null, 2)}
-        </pre>
+        <div className="grid gap-3">
+          {filtered.map((m) => (
+            <MatchPredictionCard key={m.id} match={m} />
+          ))}
+        </div>
       )}
     </>
   );
