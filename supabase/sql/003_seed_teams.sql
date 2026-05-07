@@ -1,30 +1,67 @@
--- BistekaBet — seed das 48 seleções da Copa 2026
--- Aplicar manualmente no Supabase Studio APÓS 002_init_teams_matches.sql.
--- Idempotente: re-rodar não duplica (on conflict do nothing).
---
--- ==========================================================================
--- ATENÇÃO AO OPERADOR:
--- Este arquivo é um ESQUELETO / TEMPLATE. Antes de executar em produção,
--- substitua as linhas abaixo pelos 48 times reais conforme o sorteio oficial
--- da FIFA (previsto para dez/2025). Verifique:
---   1. code   → código FIFA de 3 letras maiúsculas (ex.: 'BRA', 'GER', 'USA')
---   2. name   → nome em PT-BR
---   3. group_code → letra do grupo (A–L) conforme sorteio; deixe NULL se ainda
---                   não definido e atualize depois via UI admin em /admin/times
--- Os 3 times-sede (CAN, MEX, USA) são pré-classificados e seus grupos podem
--- ser confirmados antes do sorteio geral.
--- ==========================================================================
+-- BistekaBet — seed das 48 seleções da Copa do Mundo 2026
+-- Dados oficiais conforme sorteio FIFA de 5 dez 2025 (Kennedy Center, Washington D.C.).
+-- Aplicar manualmente no Supabase Studio. Idempotente — pode ser re-executado sem duplicar.
+-- Códigos seguem padrão FIFA (3 letras maiúsculas).
 
 insert into public.teams (code, name, group_code) values
-  ('CAN', 'Canadá',          'A'),
-  ('MEX', 'México',          'A'),
-  ('USA', 'Estados Unidos',  'A'),
-  -- TODO: substituir os placeholders abaixo pelos 45 times restantes
-  -- com os dados reais do sorteio oficial da FIFA.
-  -- Exemplo de linhas adicionais (remover/substituir conforme sorteio real):
-  ('BRA', 'Brasil',      null),
-  ('ARG', 'Argentina',   null)
-  -- IMPORTANTE: ao executar, substituir esta lista completa pelos 48 times
-  -- reais com group_code correto. Se o sorteio ainda não definiu o grupo de
-  -- algum time, deixar group_code null e atualizar depois via UI admin.
+  -- Grupo A
+  ('MEX', 'México',                 'A'),
+  ('RSA', 'África do Sul',          'A'),
+  ('KOR', 'Coreia do Sul',          'A'),
+  ('CZE', 'República Tcheca',       'A'),
+  -- Grupo B
+  ('CAN', 'Canadá',                 'B'),
+  ('BIH', 'Bósnia e Herzegovina',   'B'),
+  ('QAT', 'Catar',                  'B'),
+  ('SUI', 'Suíça',                  'B'),
+  -- Grupo C
+  ('BRA', 'Brasil',                 'C'),
+  ('MAR', 'Marrocos',               'C'),
+  ('HAI', 'Haiti',                  'C'),
+  ('SCO', 'Escócia',                'C'),
+  -- Grupo D
+  ('USA', 'Estados Unidos',         'D'),
+  ('PAR', 'Paraguai',               'D'),
+  ('AUS', 'Austrália',              'D'),
+  ('TUR', 'Turquia',                'D'),
+  -- Grupo E
+  ('GER', 'Alemanha',               'E'),
+  ('CUW', 'Curaçao',                'E'),
+  ('CIV', 'Costa do Marfim',        'E'),
+  ('ECU', 'Equador',                'E'),
+  -- Grupo F
+  ('NED', 'Países Baixos',          'F'),
+  ('JPN', 'Japão',                  'F'),
+  ('SWE', 'Suécia',                 'F'),
+  ('TUN', 'Tunísia',                'F'),
+  -- Grupo G
+  ('BEL', 'Bélgica',                'G'),
+  ('EGY', 'Egito',                  'G'),
+  ('IRN', 'Irã',                    'G'),
+  ('NZL', 'Nova Zelândia',          'G'),
+  -- Grupo H
+  ('ESP', 'Espanha',                'H'),
+  ('CPV', 'Cabo Verde',             'H'),
+  ('KSA', 'Arábia Saudita',         'H'),
+  ('URU', 'Uruguai',                'H'),
+  -- Grupo I
+  ('FRA', 'França',                 'I'),
+  ('SEN', 'Senegal',                'I'),
+  ('IRQ', 'Iraque',                 'I'),
+  ('NOR', 'Noruega',                'I'),
+  -- Grupo J
+  ('ARG', 'Argentina',              'J'),
+  ('ALG', 'Argélia',                'J'),
+  ('AUT', 'Áustria',                'J'),
+  ('JOR', 'Jordânia',               'J'),
+  -- Grupo K
+  ('POR', 'Portugal',               'K'),
+  ('COD', 'República Democrática do Congo', 'K'),
+  ('UZB', 'Uzbequistão',            'K'),
+  ('COL', 'Colômbia',               'K'),
+  -- Grupo L
+  ('ENG', 'Inglaterra',             'L'),
+  ('CRO', 'Croácia',                'L'),
+  ('GHA', 'Gana',                   'L'),
+  ('PAN', 'Panamá',                 'L')
 on conflict (code) do nothing;
