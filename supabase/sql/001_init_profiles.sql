@@ -42,7 +42,9 @@ $$;
 create or replace function public.prevent_role_change() returns trigger
 language plpgsql as $$
 begin
-  if new.role is distinct from old.role then
+  if new.role is distinct from old.role
+     and current_user not in ('postgres', 'service_role', 'supabase_admin')
+  then
     raise exception 'role can only be changed via service role';
   end if;
   new.updated_at := now();
