@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -44,14 +45,16 @@ export function AuthHeader({ profile }: { profile: Profile }) {
           </Avatar>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="min-w-56">
-          <DropdownMenuLabel className="flex flex-col gap-1">
-            <span className="font-medium">{profile.display_name}</span>
-            {profile.role === "admin" && (
-              <span className="text-xs font-semibold uppercase tracking-wider text-primary">
-                Admin
-              </span>
-            )}
-          </DropdownMenuLabel>
+          <DropdownMenuGroup>
+            <DropdownMenuLabel className="flex flex-col gap-1">
+              <span className="font-medium">{profile.display_name}</span>
+              {profile.role === "admin" && (
+                <span className="text-xs font-semibold uppercase tracking-wider text-primary">
+                  Admin
+                </span>
+              )}
+            </DropdownMenuLabel>
+          </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             onSelect={(event) => {
