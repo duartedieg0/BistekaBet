@@ -6,20 +6,27 @@ import { createClient } from "@/lib/supabase/client";
 
 export function GoogleSignInButton() {
   const [supabase] = useState(() => createClient());
+  const [pending, setPending] = useState(false);
 
   async function handleClick() {
-    await supabase.auth.signInWithOAuth({
+    setPending(true);
+    const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
         redirectTo: `${window.location.origin}/auth/callback?next=/inicio`,
       },
     });
+    if (error) {
+      console.error("OAuth init failed", error);
+      setPending(false);
+    }
+    // On success the browser navigates to Google; no need to reset pending.
   }
 
   return (
-    <Button size="lg" onClick={handleClick}>
+    <Button size="lg" onClick={handleClick} disabled={pending}>
       <GoogleIcon />
-      Entrar com Google
+      {pending ? "Redirecionando..." : "Entrar com Google"}
     </Button>
   );
 }

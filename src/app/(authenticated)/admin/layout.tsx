@@ -1,6 +1,7 @@
 // src/app/(authenticated)/admin/layout.tsx
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import type { Role } from "@/types/profile";
 
 export default async function AdminLayout({
   children,
@@ -18,7 +19,7 @@ export default async function AdminLayout({
     .from("profiles")
     .select("role")
     .eq("id", user.id)
-    .single<{ role: "usuario" | "admin" }>();
+    .single<{ role: Role }>();
 
   if (profile?.role !== "admin") notFound();
 
