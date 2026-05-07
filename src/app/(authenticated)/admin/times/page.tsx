@@ -1,4 +1,3 @@
-import { AdminShell } from "@/app/(authenticated)/admin/_components/admin-shell";
 import { createClient } from "@/lib/supabase/server";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { buttonVariants } from "@/components/ui/button";
@@ -25,7 +24,7 @@ export default async function TimesPage({
   const showForm = Boolean(sp.new) || Boolean(editing);
 
   return (
-    <AdminShell active="/admin/times" breadcrumbs={[{ label: "Times" }]}>
+    <>
       <div className="flex items-center justify-between mb-6">
         <h1 className="font-heading text-2xl">Times</h1>
         <Link href="/admin/times?new=1" className={buttonVariants()}>Nova seleção</Link>
@@ -57,6 +56,6 @@ export default async function TimesPage({
           ))}
         </TableBody>
       </Table>
-    </AdminShell>
+    </>
   );
 }

@@ -2,6 +2,7 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { Role } from "@/types/profile";
+import { AdminShell } from "./_components/admin-shell";
 
 export default async function AdminLayout({
   children,
@@ -12,7 +13,6 @@ export default async function AdminLayout({
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  // user já garantido pelo (authenticated)/layout pai; defensivo apenas
   if (!user) notFound();
 
   const { data: profile } = await supabase
@@ -23,5 +23,5 @@ export default async function AdminLayout({
 
   if (profile?.role !== "admin") notFound();
 
-  return <>{children}</>;
+  return <AdminShell>{children}</AdminShell>;
 }

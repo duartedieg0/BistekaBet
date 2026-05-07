@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
-import { AdminShell } from "@/app/(authenticated)/admin/_components/admin-shell";
 import { createClient } from "@/lib/supabase/server";
-import { STAGE_LABELS, type Match, type Team } from "@/lib/types/match";
+import type { Match, Team } from "@/lib/types/match";
 import { MatchForm } from "../_components/match-form";
 
 export default async function EditMatchPage({
@@ -25,16 +24,9 @@ export default async function EditMatchPage({
   const teams = (teamsRes.data ?? []) as Team[];
 
   return (
-    <AdminShell
-      active="/admin/partidas"
-      breadcrumbs={[
-        { label: "Partidas", href: "/admin/partidas" },
-        { label: STAGE_LABELS[match.stage] },
-        { label: "Editar" },
-      ]}
-    >
+    <>
       <h1 className="font-heading text-2xl mb-6">Editar partida</h1>
       <MatchForm match={match} teams={teams} />
-    </AdminShell>
+    </>
   );
 }

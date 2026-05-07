@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   CalendarDays,
   ChevronRight,
@@ -20,12 +23,28 @@ const ITEMS = [
 ];
 
 interface Props {
-  active?: string;
-  breadcrumbs?: { label: string; href?: string }[];
   children: React.ReactNode;
 }
 
-export function AdminShell({ active = "/admin", breadcrumbs, children }: Props) {
+function deriveActive(pathname: string): string {
+  const match = ITEMS.slice(1).find((i) => pathname.startsWith(i.href));
+  return match ? match.href : "/admin";
+}
+
+function deriveBreadcrumbs(pathname: string): { label: string; href?: string }[] {
+  if (pathname === "/admin") return [];
+  const item = ITEMS.slice(1).find((i) => pathname.startsWith(i.href));
+  if (!item) return [];
+  const isDeep = pathname !== item.href;
+  return isDeep
+    ? [{ label: item.label, href: item.href }, { label: "Detalhes" }]
+    : [{ label: item.label }];
+}
+
+export function AdminShell({ children }: Props) {
+  const pathname = usePathname();
+  const active = deriveActive(pathname);
+  const breadcrumbs = deriveBreadcrumbs(pathname);
   return (
     <div className="flex min-h-[calc(100vh-4rem)] bg-background">
       <aside className="hidden w-64 shrink-0 flex-col border-r border-border bg-sidebar lg:flex">

@@ -1,6 +1,5 @@
-import { AdminShell } from "@/app/(authenticated)/admin/_components/admin-shell";
 import { createClient } from "@/lib/supabase/server";
-import { STAGES, STAGE_LABELS, type Stage } from "@/lib/types/match";
+import { STAGES, type Stage } from "@/lib/types/match";
 import { StageTabs } from "./_components/stage-tabs";
 import { MatchList, type MatchWithTeams } from "./_components/match-list";
 
@@ -32,13 +31,10 @@ export default async function PartidasPage({
   if (error) throw error;
 
   return (
-    <AdminShell
-      active="/admin/partidas"
-      breadcrumbs={[{ label: "Partidas" }, { label: STAGE_LABELS[stage] }]}
-    >
+    <>
       <h1 className="font-heading text-2xl mb-6">Partidas</h1>
       <StageTabs current={stage} groupCode={groupCode} />
       <MatchList matches={(data ?? []) as MatchWithTeams[]} />
-    </AdminShell>
+    </>
   );
 }
