@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import type { MatchWithPrediction } from "@/lib/types/prediction";
 import { savePrediction } from "../_actions";
 import { bracketSlotLabel } from "../_lib/bracket-labels";
+import { useGroupSave } from "./group-save-form";
 
 export function MatchPredictionCard({ match }: { match: MatchWithPrediction }) {
   const isKnockout = match.stage !== "group";
@@ -35,6 +36,26 @@ export function MatchPredictionCard({ match }: { match: MatchWithPrediction }) {
       advancesSlot !== p.advances_slot
     );
   }, [home, away, advancesTeamId, advancesSlot, match.prediction]);
+
+  const groupCtx = useGroupSave();
+
+  useEffect(() => {
+    if (!groupCtx) return;
+    return groupCtx.register(match.id, () => {
+      if (isClosed) return null;
+      if (!dirty) return null;
+      if (validate() !== null) return null;
+      return {
+        matchId: match.id,
+        homeScore: homeNum!,
+        awayScore: awayNum!,
+        advancesTeamId,
+        advancesSlot,
+      };
+    });
+    // validate is closed over local state; safe to omit from deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [groupCtx, match.id, isClosed, dirty, homeNum, awayNum, advancesTeamId, advancesSlot]);
 
   const homeLabel = match.home_team?.name ?? bracketSlotLabel(match.stage, match.bracket_position, "home");
   const awayLabel = match.away_team?.name ?? bracketSlotLabel(match.stage, match.bracket_position, "away");

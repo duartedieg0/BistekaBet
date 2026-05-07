@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { STAGES, type Stage } from "@/lib/types/match";
 import { StageTabs } from "./_components/stage-tabs";
 import { MatchPredictionCard } from "./_components/match-prediction-card";
+import { GroupSaveForm } from "./_components/group-save-form";
 import { getMatchesWithPredictions } from "./_lib/queries";
 
 export default async function PalpitesPage({
@@ -27,6 +28,8 @@ export default async function PalpitesPage({
     return true;
   });
 
+  const savedCount = filtered.filter((m) => m.prediction !== null).length;
+
   return (
     <>
       <h1 className="font-heading text-2xl mb-6">Palpites</h1>
@@ -34,11 +37,13 @@ export default async function PalpitesPage({
       {filtered.length === 0 ? (
         <p className="text-muted-foreground">Nenhum jogo disponível ainda.</p>
       ) : (
-        <div className="grid gap-3">
-          {filtered.map((m) => (
-            <MatchPredictionCard key={m.id} match={m} />
-          ))}
-        </div>
+        <GroupSaveForm total={filtered.length} savedCount={savedCount}>
+          <div className="grid gap-3">
+            {filtered.map((m) => (
+              <MatchPredictionCard key={m.id} match={m} />
+            ))}
+          </div>
+        </GroupSaveForm>
       )}
     </>
   );
