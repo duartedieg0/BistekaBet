@@ -1,44 +1,53 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { GROUP_CODES, STAGE_LABELS, STAGES, type Stage } from "@/lib/types/match";
 
 export function StageTabs({ current, groupCode }: { current: Stage; groupCode?: string }) {
+  const router = useRouter();
+
   return (
-    <div className="space-y-3 mb-6">
-      <div className="flex flex-wrap gap-2">
-        {STAGES.map((s) => {
-          const href = s === "group" ? "/palpites?stage=group&group=A" : `/palpites?stage=${s}`;
-          const active = current === s;
-          return (
-            <Link
-              key={s}
-              href={href}
-              className={cn(
-                "rounded-md px-3 py-1.5 text-sm border",
-                active ? "bg-primary text-primary-foreground" : "bg-background hover:bg-muted",
-              )}
-            >
+    <div className="flex flex-col gap-3 mb-6">
+      <Tabs
+        value={current}
+        onValueChange={(v) => {
+          const stage = v as Stage;
+          const href = stage === "group" ? "/palpites?stage=group&group=A" : `/palpites?stage=${stage}`;
+          router.push(href);
+        }}
+      >
+        <TabsList className="flex-wrap h-auto">
+          {STAGES.map((s) => (
+            <TabsTrigger key={s} value={s}>
               {STAGE_LABELS[s]}
-            </Link>
-          );
-        })}
-      </div>
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
+
       {current === "group" ? (
-        <div className="flex flex-wrap gap-1">
+        <div className="flex flex-wrap gap-1.5">
           {GROUP_CODES.map((g) => {
             const active = groupCode === g;
             return (
               <Link
                 key={g}
                 href={`/palpites?stage=group&group=${g}`}
-                className={cn(
-                  "rounded px-2.5 py-1 text-xs font-mono border",
-                  active ? "bg-foreground text-background" : "bg-background hover:bg-muted",
-                )}
+                aria-current={active ? "page" : undefined}
               >
-                {g}
+                <Badge
+                  variant={active ? "default" : "outline"}
+                  className={cn(
+                    "h-7 px-2.5 cursor-pointer font-mono",
+                    !active && "hover:bg-muted",
+                  )}
+                >
+                  {g}
+                </Badge>
               </Link>
             );
           })}
