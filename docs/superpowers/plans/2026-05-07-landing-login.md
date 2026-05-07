@@ -338,11 +338,12 @@ git commit -m "feat(ui): add shadcn avatar and dropdown-menu"
 ```tsx
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 
 export function GoogleSignInButton() {
-  const supabase = createClient();
+  const [supabase] = useState(() => createClient());
 
   async function handleClick() {
     await supabase.auth.signInWithOAuth({
@@ -469,7 +470,7 @@ git commit -m "feat(auth): add signout handler"
 
 - [ ] **Step 1: Atualizar metadata e lang em `src/app/layout.tsx`**
 
-Trocar `lang="en"` por `lang="pt-BR"`. Substituir `metadata`:
+Preserve o `import type { Metadata } from "next"` existente. Trocar `lang="en"` por `lang="pt-BR"` e substituir o objeto `metadata`:
 
 ```ts
 export const metadata: Metadata = {
@@ -561,10 +562,15 @@ export function getInitials(displayName: string): string {
 }
 ```
 
-- [ ] **Step 2: Criar `AuthHeader`**
+- [ ] **Step 2: Criar `AuthHeader` (Client Component)**
+
+> Por que Client: o `<form>` precisa ficar fora do `DropdownMenuContent` (portaled) para evitar DOM inválido (`role=menu` envolvendo `<form>`). Solução: form escondido fora do menu + `onSelect` no item dispara `requestSubmit()`.
 
 ```tsx
 // src/app/(authenticated)/_components/auth-header.tsx
+"use client";
+
+import { useRef } from "react";
 import Link from "next/link";
 import { LogOut } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -580,18 +586,29 @@ import type { Profile } from "@/types/profile";
 import { getInitials } from "./avatar-fallback";
 
 export function AuthHeader({ profile }: { profile: Profile }) {
+  const signoutFormRef = useRef<HTMLFormElement>(null);
+
   return (
     <header className="flex items-center justify-between border-b px-6 py-3">
       <Link href="/inicio" className="font-semibold tracking-tight">
         BistekaBet
       </Link>
 
+      {/* form fora do menu para evitar DOM inválido (form dentro de role=menu) */}
+      <form
+        ref={signoutFormRef}
+        action="/auth/signout"
+        method="post"
+        className="hidden"
+      />
+
       <DropdownMenu>
         <DropdownMenuTrigger className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring">
           <Avatar className="size-9">
-            {profile.avatar_url && (
-              <AvatarImage src={profile.avatar_url} alt={profile.display_name} />
-            )}
+            <AvatarImage
+              src={profile.avatar_url ?? undefined}
+              alt={profile.display_name}
+            />
             <AvatarFallback>{getInitials(profile.display_name)}</AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>
@@ -605,17 +622,16 @@ export function AuthHeader({ profile }: { profile: Profile }) {
             )}
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <form action="/auth/signout" method="post">
-            <DropdownMenuItem asChild>
-              <button
-                type="submit"
-                className="flex w-full items-center gap-2 text-left"
-              >
-                <LogOut className="size-4" />
-                Sair
-              </button>
-            </DropdownMenuItem>
-          </form>
+          <DropdownMenuItem
+            onSelect={(event) => {
+              event.preventDefault();
+              signoutFormRef.current?.requestSubmit();
+            }}
+            className="flex items-center gap-2"
+          >
+            <LogOut className="size-4" />
+            Sair
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </header>
@@ -723,6 +739,7 @@ export default async function AdminLayout({
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  // user já garantido pelo (authenticated)/layout pai; defensivo apenas
   if (!user) notFound();
 
   const { data: profile } = await supabase
