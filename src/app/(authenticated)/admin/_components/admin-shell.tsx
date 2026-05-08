@@ -49,12 +49,12 @@ export function AdminShell({ children }: Props) {
     <div className="flex min-h-[calc(100vh-4rem)] bg-background">
       <aside className="hidden w-64 shrink-0 flex-col border-r border-border bg-sidebar lg:flex">
         <div className="flex items-center gap-2 border-b border-border px-5 py-4">
-          <div className="flex size-8 items-center justify-center rounded-md bg-[oklch(0.74_0.16_65/0.15)] text-[oklch(0.55_0.16_65)] dark:text-[oklch(0.85_0.16_65)]">
+          <div className="flex size-8 items-center justify-center rounded-md bg-destructive/15 text-destructive">
             <ShieldCheck className="size-4" />
           </div>
           <div className="flex flex-col leading-tight">
-            <span className="font-heading text-lg tracking-wide">Painel</span>
-            <span className="text-[10px] font-semibold uppercase tracking-widest text-[oklch(0.55_0.16_65)] dark:text-[oklch(0.85_0.16_65)]">
+            <span className="font-heading text-lg uppercase tracking-wide">Painel</span>
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-destructive">
               Modo Admin
             </span>
           </div>
@@ -70,7 +70,7 @@ export function AdminShell({ children }: Props) {
                 className={cn(
                   "inline-flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                   isActive
-                    ? "bg-[oklch(0.74_0.16_65/0.12)] text-[oklch(0.45_0.16_65)] dark:text-[oklch(0.88_0.16_65)]"
+                    ? "bg-destructive/10 text-destructive"
                     : "text-muted-foreground hover:bg-muted hover:text-foreground"
                 )}
               >
@@ -91,9 +91,9 @@ export function AdminShell({ children }: Props) {
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <div className="flex h-12 items-center gap-2 border-b border-border bg-[oklch(0.74_0.16_65/0.05)] px-6 text-xs">
-          <ShieldCheck className="size-3.5 text-[oklch(0.55_0.16_65)] dark:text-[oklch(0.85_0.16_65)]" />
-          <span className="font-semibold uppercase tracking-widest text-[oklch(0.45_0.16_65)] dark:text-[oklch(0.88_0.16_65)]">
+        <div className="flex h-12 items-center gap-2 border-b border-border bg-destructive/5 px-6 text-xs">
+          <ShieldCheck className="size-3.5 text-destructive" />
+          <span className="font-semibold uppercase tracking-widest text-destructive">
             Admin
           </span>
           {breadcrumbs?.length ? (

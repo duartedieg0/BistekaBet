@@ -1,8 +1,9 @@
 "use client";
 
 import { useRef } from "react";
+import Image from "next/image";
 import Link from "next/link";
-import { LogOut, Trophy } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -33,10 +34,19 @@ export function AuthHeader({ profile }: { profile: Profile }) {
           href="/inicio"
           className="inline-flex items-center gap-2 outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-md"
         >
-          <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Trophy className="size-4" />
+          <span className="flex size-9 items-center justify-center overflow-hidden rounded-md bg-secondary ring-1 ring-border">
+            <Image
+              src="/BISTECA.png"
+              alt=""
+              width={36}
+              height={36}
+              priority
+              className="size-9 object-contain"
+            />
           </span>
-          <span className="font-heading text-2xl tracking-wide">BistekaBet</span>
+          <span className="font-heading text-2xl uppercase tracking-wide">
+            Bisteka<span className="text-primary">Bet</span>
+          </span>
         </Link>
 
         <nav
@@ -55,7 +65,7 @@ export function AuthHeader({ profile }: { profile: Profile }) {
           {profile.role === "admin" && (
             <Link
               href="/admin"
-              className="ml-2 rounded-md border border-[oklch(0.74_0.16_65/0.4)] bg-[oklch(0.74_0.16_65/0.08)] px-3 py-1.5 text-sm font-semibold uppercase tracking-wider text-[oklch(0.55_0.16_65)] transition-colors hover:bg-[oklch(0.74_0.16_65/0.15)] dark:text-[oklch(0.85_0.16_65)]"
+              className="ml-2 rounded-md border border-destructive/30 bg-destructive/10 px-3 py-1.5 text-sm font-semibold uppercase tracking-wider text-destructive transition-colors hover:bg-destructive/15"
             >
               Admin
             </Link>
@@ -84,7 +94,7 @@ export function AuthHeader({ profile }: { profile: Profile }) {
               <DropdownMenuLabel className="flex flex-col gap-1">
                 <span className="font-medium">{profile.display_name}</span>
                 {profile.role === "admin" && (
-                  <span className="text-xs font-semibold uppercase tracking-wider text-primary">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-destructive">
                     Admin
                   </span>
                 )}

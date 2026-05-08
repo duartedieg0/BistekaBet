@@ -86,10 +86,10 @@ export default async function UsuariosPage() {
   return (
     <>
       <header className="flex flex-col gap-1 pb-8">
-        <p className="text-xs font-semibold uppercase tracking-widest text-[oklch(0.55_0.16_65)] dark:text-[oklch(0.85_0.16_65)]">
+        <p className="text-xs font-semibold uppercase tracking-widest text-destructive">
           Usuários
         </p>
-        <h1 className="font-heading text-4xl tracking-tight sm:text-5xl">
+        <h1 className="font-heading text-4xl uppercase tracking-tight sm:text-5xl">
           Participantes do bolão
         </h1>
         <p className="text-muted-foreground">

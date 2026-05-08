@@ -1,4 +1,4 @@
-import { CalendarX } from "lucide-react";
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -40,7 +40,7 @@ export default async function PalpitesPage({
           <p className="text-xs font-semibold uppercase tracking-widest text-primary">
             Seus palpites
           </p>
-          <h1 className="font-heading text-4xl tracking-tight sm:text-5xl">
+          <h1 className="font-heading text-4xl uppercase tracking-tight sm:text-5xl">
             Tabela de jogos
           </h1>
           <p className="text-muted-foreground">
@@ -57,10 +57,22 @@ export default async function PalpitesPage({
       <StageTabs current={stage} groupCode={groupCode} />
 
       {filtered.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center gap-3 py-12 text-center">
-            <CalendarX className="size-10 text-muted-foreground" />
-            <p className="text-muted-foreground">Nenhum jogo disponível ainda.</p>
+        <Card className="border-2 border-foreground/10">
+          <CardContent className="flex flex-col items-center gap-4 py-14 text-center">
+            <Image
+              src="/BISTECA.png"
+              alt=""
+              width={120}
+              height={154}
+              className="h-28 w-auto opacity-80"
+            />
+            <p className="font-heading text-2xl uppercase tracking-wide">
+              Nenhum jogo no forno
+            </p>
+            <p className="max-w-sm text-sm text-muted-foreground">
+              Os jogos aparecem aqui assim que a tabela da Copa 2026 for
+              publicada. Volte logo.
+            </p>
           </CardContent>
         </Card>
       ) : (

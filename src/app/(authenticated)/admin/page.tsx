@@ -6,10 +6,10 @@ export default function AdminPage() {
   return (
     <>
       <header className="flex flex-col gap-1 pb-8">
-        <p className="text-xs font-semibold uppercase tracking-widest text-[oklch(0.55_0.16_65)] dark:text-[oklch(0.85_0.16_65)]">
+        <p className="text-xs font-semibold uppercase tracking-widest text-destructive">
           Visão geral
         </p>
-        <h1 className="font-heading text-4xl tracking-tight sm:text-5xl">
+        <h1 className="font-heading text-4xl uppercase tracking-tight sm:text-5xl">
           Painel do BistekaBet
         </h1>
         <p className="text-muted-foreground">
@@ -70,7 +70,7 @@ function Kpi({
           <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
             {label}
           </span>
-          <div className="flex size-9 items-center justify-center rounded-lg bg-[oklch(0.74_0.16_65/0.12)] text-[oklch(0.55_0.16_65)] dark:text-[oklch(0.85_0.16_65)]">
+          <div className="flex size-9 items-center justify-center rounded-lg bg-destructive/10 text-destructive">
             <Icon className="size-4" />
           </div>
         </div>

@@ -11,7 +11,7 @@ export default function InicioPage() {
           <p className="text-xs font-semibold uppercase tracking-widest text-primary">
             Sua rodada
           </p>
-          <h1 className="font-heading text-4xl tracking-tight sm:text-5xl">
+          <h1 className="font-heading text-4xl uppercase tracking-tight sm:text-5xl">
             Bem-vindo ao bolão
           </h1>
           <p className="text-muted-foreground">
