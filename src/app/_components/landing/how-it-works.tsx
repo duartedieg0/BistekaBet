@@ -45,7 +45,7 @@ export function HowItWorks() {
         <ol className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {steps.map(({ n, icon: Icon, title, body }) => (
             <li key={n}>
-              <Card className="group relative h-full overflow-hidden border-border/60 transition-all duration-200 hover:border-primary/40 hover:shadow-[var(--shadow-md)]">
+              <Card className="group relative h-full overflow-hidden border-2 border-foreground transition-all duration-200 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-stamp">
                 <CardContent className="flex h-full flex-col gap-4 p-7">
                   <div className="flex items-center justify-between">
                     <span className="font-heading text-5xl text-muted-foreground/30 tabular">

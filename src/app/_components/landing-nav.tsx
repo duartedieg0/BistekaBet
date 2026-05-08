@@ -1,15 +1,24 @@
-import { Trophy } from "lucide-react";
+import Image from "next/image";
 import { buttonVariants } from "@/components/ui/button";
 
 export function LandingNav() {
   return (
-    <header className="sticky top-0 z-40 border-b border-white/5 bg-[oklch(0.16_0.02_150)]/70 backdrop-blur-md">
+    <header className="sticky top-0 z-40 border-b border-white/10 bg-[oklch(0.14_0.01_30)]/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 text-white">
-        <a href="#" className="inline-flex items-center gap-2">
-          <span className="flex size-8 items-center justify-center rounded-lg bg-[oklch(0.92_0.20_120)] text-[oklch(0.16_0.02_150)]">
-            <Trophy className="size-4" />
+        <a href="#" className="inline-flex items-center gap-2.5">
+          <span className="flex size-9 items-center justify-center overflow-hidden rounded-md bg-white/5 ring-1 ring-white/10">
+            <Image
+              src="/BISTECA.png"
+              alt=""
+              width={36}
+              height={36}
+              priority
+              className="size-9 object-contain"
+            />
           </span>
-          <span className="font-heading text-2xl tracking-wide">BistekaBet</span>
+          <span className="font-heading text-2xl tracking-wide uppercase">
+            Bisteka<span className="text-[oklch(0.85_0.18_85)]">Bet</span>
+          </span>
         </a>
 
         <nav className="hidden items-center gap-8 text-sm text-white/70 md:flex">

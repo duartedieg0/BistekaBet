@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Bebas_Neue, Geist_Mono, Inter } from "next/font/google";
+import { Anton, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({
@@ -8,8 +8,8 @@ const inter = Inter({
   display: "swap",
 });
 
-const bebas = Bebas_Neue({
-  variable: "--font-bebas",
+const anton = Anton({
+  variable: "--font-anton",
   weight: "400",
   subsets: ["latin"],
   display: "swap",
@@ -35,7 +35,7 @@ export default function RootLayout({
   return (
     <html
       lang="pt-BR"
-      className={`${inter.variable} ${bebas.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${inter.variable} ${anton.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
         {children}

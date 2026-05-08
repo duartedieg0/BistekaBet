@@ -1,4 +1,4 @@
-import { Trophy } from "lucide-react";
+import Image from "next/image";
 
 export function LandingFooter() {
   return (
@@ -40,8 +40,14 @@ export function LandingFooter() {
       <div className="border-t border-border">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-6 py-5 text-xs text-muted-foreground sm:flex-row">
           <span>© {new Date().getFullYear()} BistekaBet. Todos os direitos reservados.</span>
-          <span className="inline-flex items-center gap-1.5">
-            <Trophy className="size-3.5 text-primary" />
+          <span className="inline-flex items-center gap-2">
+            <Image
+              src="/BISTECA.png"
+              alt=""
+              width={20}
+              height={20}
+              className="size-5 object-contain"
+            />
             Bolão da Copa 2026 · feito por torcedores
           </span>
         </div>
@@ -80,11 +86,19 @@ function FooterCol({
 
 function Wordmark() {
   return (
-    <span className="inline-flex items-center gap-2">
-      <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-        <Trophy className="size-4" />
+    <span className="inline-flex items-center gap-2.5">
+      <span className="flex size-9 items-center justify-center overflow-hidden rounded-md bg-secondary ring-1 ring-border">
+        <Image
+          src="/BISTECA.png"
+          alt=""
+          width={36}
+          height={36}
+          className="size-9 object-contain"
+        />
       </span>
-      <span className="font-heading text-2xl tracking-wide">BistekaBet</span>
+      <span className="font-heading text-2xl uppercase tracking-wide">
+        Bisteka<span className="text-primary">Bet</span>
+      </span>
     </span>
   );
 }
