@@ -1,6 +1,7 @@
 // Lista de usuários do bolão. Mescla auth.users (email, last_sign_in_at)
 // com profiles (display_name, avatar_url) via service-role server-side.
 import { createAdminClient } from "@/lib/supabase/admin";
+import { PaidToggle } from "./_components/paid-toggle";
 import {
   Avatar,
   AvatarFallback,
@@ -20,6 +21,7 @@ type ProfileRow = {
   display_name: string;
   avatar_url: string | null;
   created_at: string;
+  paid: boolean;
 };
 
 type UserRow = {
@@ -29,6 +31,7 @@ type UserRow = {
   avatarUrl: string | null;
   createdAt: string;
   lastSignInAt: string | null;
+  paid: boolean;
 };
 
 const dateFmt = new Intl.DateTimeFormat("pt-BR", {
@@ -54,7 +57,7 @@ async function loadUsers(): Promise<UserRow[]> {
 
   const { data: profiles, error: profErr } = await supabase
     .from("profiles")
-    .select("id, display_name, avatar_url, created_at");
+    .select("id, display_name, avatar_url, created_at, paid");
   if (profErr) throw profErr;
 
   const profileById = new Map<string, ProfileRow>(
@@ -71,6 +74,7 @@ async function loadUsers(): Promise<UserRow[]> {
         avatarUrl: p?.avatar_url ?? null,
         createdAt: p?.created_at ?? u.created_at,
         lastSignInAt: u.last_sign_in_at ?? null,
+        paid: p?.paid ?? false,
       };
     })
     .sort((a, b) => {
@@ -93,7 +97,8 @@ export default async function UsuariosPage() {
           Participantes do bolão
         </h1>
         <p className="text-muted-foreground">
-          {users.length} {users.length === 1 ? "usuário cadastrado" : "usuários cadastrados"}.
+          {users.length} {users.length === 1 ? "usuário cadastrado" : "usuários cadastrados"}
+          {users.length > 0 ? ` · ${users.filter((u) => u.paid).length} pagaram` : ""}.
         </p>
       </header>
 
@@ -103,6 +108,7 @@ export default async function UsuariosPage() {
             <TableHead className="w-12" />
             <TableHead>Nome</TableHead>
             <TableHead>Email</TableHead>
+            <TableHead>Pago</TableHead>
             <TableHead>Cadastro</TableHead>
             <TableHead>Último acesso</TableHead>
           </TableRow>
@@ -110,7 +116,7 @@ export default async function UsuariosPage() {
         <TableBody>
           {users.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+              <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
                 Nenhum usuário cadastrado ainda.
               </TableCell>
             </TableRow>
@@ -127,6 +133,9 @@ export default async function UsuariosPage() {
                 </TableCell>
                 <TableCell className="font-medium">{u.displayName}</TableCell>
                 <TableCell className="text-muted-foreground">{u.email}</TableCell>
+                <TableCell>
+                  <PaidToggle userId={u.id} paid={u.paid} />
+                </TableCell>
                 <TableCell className="tabular-nums">
                   {dateFmt.format(new Date(u.createdAt))}
                 </TableCell>
