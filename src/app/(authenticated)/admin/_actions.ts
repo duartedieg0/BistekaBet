@@ -38,5 +38,6 @@ export async function recomputeAllScores(): Promise<{
   revalidatePath("/admin");
   revalidatePath("/inicio");
   revalidatePath("/classificacao");
+  revalidatePath("/palpites");
   return { matchesProcessed: matches?.length ?? 0, upserted, deleted };
 }
