@@ -2,6 +2,7 @@ import Link from "next/link";
 import { deriveMatchStatus } from "@/lib/match-status";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import type { Match, Team } from "@/lib/types/match";
+import { RescheduledBadge } from "@/app/(authenticated)/palpites/_components/rescheduled-badge";
 
 export type MatchWithTeams = Match & {
   home_team: Pick<Team, "id" | "code" | "name"> | null;
@@ -49,7 +50,12 @@ export function MatchList({ matches }: { matches: MatchWithTeams[] }) {
           const status = deriveMatchStatus(m);
           return (
             <TableRow key={m.id}>
-              <TableCell>{new Date(m.kickoff_at).toLocaleString("pt-BR")}</TableCell>
+              <TableCell>
+                <span className="inline-flex items-center gap-2">
+                  {new Date(m.kickoff_at).toLocaleString("pt-BR")}
+                  <RescheduledBadge originalKickoff={m.original_kickoff_at} />
+                </span>
+              </TableCell>
               <TableCell>{m.home_team?.name ?? "—"}</TableCell>
               <TableCell className="text-center font-mono">{formatScore(m)}</TableCell>
               <TableCell>{m.away_team?.name ?? "—"}</TableCell>
