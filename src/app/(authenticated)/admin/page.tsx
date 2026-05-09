@@ -1,6 +1,7 @@
 import { CalendarDays, TrendingUp, Users } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { RecomputeScoresCard } from "./_components/recompute-scores-card";
 
 export default function AdminPage() {
   return (
@@ -38,15 +39,7 @@ export default function AdminPage() {
             <Skeleton className="h-24 w-full rounded-lg" />
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="flex flex-col gap-4 p-6">
-            <h2 className="font-heading text-2xl tracking-wide">
-              Atividade recente
-            </h2>
-            <Skeleton className="h-24 w-full rounded-lg" />
-            <Skeleton className="h-24 w-full rounded-lg" />
-          </CardContent>
-        </Card>
+        <RecomputeScoresCard />
       </section>
     </>
   );
