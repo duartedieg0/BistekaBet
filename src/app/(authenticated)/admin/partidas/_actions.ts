@@ -41,5 +41,7 @@ export async function updateMatch(matchId: string, formData: FormData) {
 
   revalidatePath("/admin/partidas");
   revalidatePath(`/admin/partidas/${matchId}`);
+  revalidatePath("/inicio");
+  revalidatePath("/classificacao");
   redirect("/admin/partidas");
 }
