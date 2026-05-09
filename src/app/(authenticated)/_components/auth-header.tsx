@@ -20,7 +20,7 @@ import { getInitials } from "./avatar-fallback";
 const NAV = [
   { href: "/inicio", label: "Início" },
   { href: "/palpites", label: "Palpites" },
-  { href: "/inicio#ranking", label: "Ranking" },
+  { href: "/classificacao", label: "Ranking" },
   { href: "/inicio#regras", label: "Regras" },
 ];
 

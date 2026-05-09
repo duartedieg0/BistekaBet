@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 const ITEMS = [
   { href: "/inicio", label: "Início", icon: Home },
   { href: "/inicio#bets", label: "Minhas apostas", icon: CalendarDays },
-  { href: "/inicio#ranking", label: "Ranking", icon: Trophy },
+  { href: "/classificacao", label: "Ranking", icon: Trophy },
   { href: "/inicio#regras", label: "Regras", icon: ScrollText },
 ];
 
