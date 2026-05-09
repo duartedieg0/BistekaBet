@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { recomputeMatchScores } from "@/lib/scoring/recompute";
 import { updateMatchSchema } from "@/lib/validation/match";
 
 function parseIntOrNull(v: FormDataEntryValue | null): number | null {
@@ -35,6 +36,8 @@ export async function updateMatch(matchId: string, formData: FormData) {
   const supabase = await createClient();
   const { error } = await supabase.from("matches").update(parsed.data).eq("id", matchId);
   if (error) throw error;
+
+  await recomputeMatchScores(matchId);
 
   revalidatePath("/admin/partidas");
   revalidatePath(`/admin/partidas/${matchId}`);
