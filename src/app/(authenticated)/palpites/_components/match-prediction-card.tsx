@@ -12,6 +12,7 @@ import { savePrediction } from "../_actions";
 import { bracketSlotLabel } from "../_lib/bracket-labels";
 import { useGroupSave } from "./group-save-form";
 import { ScoreBadge } from "./score-badge";
+import { RescheduledBadge } from "./rescheduled-badge";
 
 export function MatchPredictionCard({ match }: { match: MatchWithPrediction }) {
   const isKnockout = match.stage !== "group";
@@ -114,7 +115,10 @@ export function MatchPredictionCard({ match }: { match: MatchWithPrediction }) {
     <Card size="sm">
       <form onSubmit={onSubmit}>
         <CardHeader className="flex flex-row items-center justify-between gap-2">
-          <span className="text-xs font-medium tabular text-muted-foreground">{kickoffLabel}</span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-medium tabular text-muted-foreground">{kickoffLabel}</span>
+            <RescheduledBadge originalKickoff={match.original_kickoff_at} />
+          </div>
           {statusBadge}
         </CardHeader>
 
