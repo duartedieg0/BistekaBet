@@ -2,6 +2,7 @@ import { CalendarDays, Flame, Trophy } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { RankingPreview } from "./_components/ranking-preview";
 
 export default function InicioPage() {
   return (
@@ -74,6 +75,10 @@ export default function InicioPage() {
             </CardContent>
           </Card>
         </div>
+      </section>
+
+      <section className="mt-10">
+        <RankingPreview />
       </section>
     </main>
   );
