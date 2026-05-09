@@ -1,11 +1,15 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { MatchWithPrediction } from "@/lib/types/prediction";
+import type {
+  MatchWithPrediction,
+  PredictionScore,
+} from "@/lib/types/prediction";
+import type { Tier } from "@/lib/scoring";
 
 export async function getMatchesWithPredictions(
   supabase: SupabaseClient,
   userId: string,
 ): Promise<MatchWithPrediction[]> {
-  const { data, error } = await supabase
+  const matchesP = supabase
     .from("matches")
     .select(`
       *,
@@ -18,10 +22,29 @@ export async function getMatchesWithPredictions(
     .eq("predictions.user_id", userId)
     .order("kickoff_at", { ascending: true });
 
-  if (error) throw error;
+  const scoresP = supabase
+    .from("prediction_scores")
+    .select("prediction_id, points, tier")
+    .eq("user_id", userId);
 
-  return (data ?? []).map((row: { prediction: unknown[] | null }) => ({
-    ...(row as object),
-    prediction: Array.isArray(row.prediction) && row.prediction.length > 0 ? row.prediction[0] : null,
-  })) as MatchWithPrediction[];
+  const [matchesRes, scoresRes] = await Promise.all([matchesP, scoresP]);
+  if (matchesRes.error) throw matchesRes.error;
+  if (scoresRes.error) throw scoresRes.error;
+
+  const scoreByPredId = new Map<string, PredictionScore>();
+  const scoreRows =
+    (scoresRes.data ?? []) as { prediction_id: string; points: number; tier: Tier }[];
+  for (const r of scoreRows) {
+    scoreByPredId.set(r.prediction_id, { points: r.points, tier: r.tier });
+  }
+
+  return (matchesRes.data ?? []).map((row: { prediction: unknown[] | null }) => {
+    const predictionArr = row.prediction;
+    const prediction =
+      Array.isArray(predictionArr) && predictionArr.length > 0
+        ? (predictionArr[0] as MatchWithPrediction["prediction"])
+        : null;
+    const score = prediction ? scoreByPredId.get(prediction.id) ?? null : null;
+    return { ...(row as object), prediction, score };
+  }) as MatchWithPrediction[];
 }
