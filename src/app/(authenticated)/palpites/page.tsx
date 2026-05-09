@@ -32,6 +32,10 @@ export default async function PalpitesPage({
   });
 
   const savedCount = filtered.filter((m) => m.prediction !== null).length;
+  const totalPts = filtered.reduce(
+    (acc, m) => acc + (m.score?.points ?? 0),
+    0,
+  );
 
   return (
     <main className="mx-auto w-full max-w-7xl flex-1 px-6 py-10">
@@ -49,7 +53,7 @@ export default async function PalpitesPage({
         </div>
         {filtered.length > 0 ? (
           <Badge variant="secondary" className="h-7 px-3 text-xs">
-            {savedCount}/{filtered.length} palpites
+            {savedCount}/{filtered.length} palpites · {totalPts} pts
           </Badge>
         ) : null}
       </header>
