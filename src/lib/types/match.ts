@@ -45,6 +45,7 @@ export interface Match {
   home_team_id: string | null;
   away_team_id: string | null;
   kickoff_at: string;
+  original_kickoff_at: string | null;
   venue: string | null;
   status: ExplicitMatchStatus | null;
   home_score: number | null;
