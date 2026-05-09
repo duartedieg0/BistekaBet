@@ -33,6 +33,11 @@ export function MatchForm({ match, teams }: { match: Match; teams: Team[] }) {
             defaultValue={toLocalInput(match.kickoff_at)}
             required
           />
+          {match.original_kickoff_at && (
+            <p className="text-xs text-muted-foreground mt-1">
+              Kickoff original: {new Date(match.original_kickoff_at).toLocaleString("pt-BR")}
+            </p>
+          )}
         </div>
         <div>
           <Label htmlFor="venue">Sede</Label>
