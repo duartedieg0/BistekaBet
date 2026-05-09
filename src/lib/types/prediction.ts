@@ -1,4 +1,5 @@
 import type { Match, Team } from "@/lib/types/match";
+import type { Tier } from "@/lib/scoring";
 
 export interface Prediction {
   id: string;
@@ -12,8 +13,14 @@ export interface Prediction {
   updated_at: string;
 }
 
+export interface PredictionScore {
+  points: number;
+  tier: Tier;
+}
+
 export interface MatchWithPrediction extends Match {
   home_team: Pick<Team, "id" | "code" | "name" | "flag_url"> | null;
   away_team: Pick<Team, "id" | "code" | "name" | "flag_url"> | null;
   prediction: Prediction | null;
+  score: PredictionScore | null;
 }
