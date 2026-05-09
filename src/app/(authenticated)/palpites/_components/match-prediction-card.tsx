@@ -11,6 +11,7 @@ import type { MatchWithPrediction } from "@/lib/types/prediction";
 import { savePrediction } from "../_actions";
 import { bracketSlotLabel } from "../_lib/bracket-labels";
 import { useGroupSave } from "./group-save-form";
+import { ScoreBadge } from "./score-badge";
 
 export function MatchPredictionCard({ match }: { match: MatchWithPrediction }) {
   const isKnockout = match.stage !== "group";
@@ -110,7 +111,7 @@ export function MatchPredictionCard({ match }: { match: MatchWithPrediction }) {
   ) : null;
 
   return (
-    <Card size="sm" className={cn(isClosed && "opacity-60")}>
+    <Card size="sm">
       <form onSubmit={onSubmit}>
         <CardHeader className="flex flex-row items-center justify-between gap-2">
           <span className="text-xs font-medium tabular text-muted-foreground">{kickoffLabel}</span>
@@ -143,7 +144,7 @@ export function MatchPredictionCard({ match }: { match: MatchWithPrediction }) {
           <TeamSlot label={awayLabel} code={awayCode} flagUrl={match.away_team?.flag_url ?? null} align="start" />
         </CardContent>
 
-        {knockoutNeedsAdvance ? (
+        {!isClosed && knockoutNeedsAdvance ? (
           <CardContent className="pt-2">
             <fieldset className="rounded-md bg-muted/50 p-3">
               <legend className="px-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
@@ -191,11 +192,42 @@ export function MatchPredictionCard({ match }: { match: MatchWithPrediction }) {
           </CardContent>
         ) : null}
 
-        <CardFooter className="justify-end">
-          <Button type="submit" size="sm" disabled={isClosed || isPending || !dirty}>
-            {isPending ? "Salvando..." : savedTick ? "✓ Salvo" : "Salvar"}
-          </Button>
-        </CardFooter>
+        {isClosed && (
+          <CardContent className="flex items-center justify-between gap-3 pt-0 pb-3">
+            <span className="text-xs uppercase tracking-widest text-muted-foreground">
+              {match.status === "cancelled"
+                ? "Partida cancelada"
+                : match.status === "postponed"
+                ? "Partida adiada"
+                : match.home_score === null || match.away_score === null
+                ? "Aguardando resultado oficial"
+                : "Resultado oficial"}
+            </span>
+            {match.home_score !== null &&
+            match.away_score !== null &&
+            match.status !== "cancelled" &&
+            match.status !== "postponed" ? (
+              <span
+                className="font-heading text-lg tabular-nums"
+                aria-label={`Resultado oficial: ${match.home_score} a ${match.away_score}`}
+              >
+                {match.home_score} <span className="opacity-50">×</span>{" "}
+                {match.away_score}
+              </span>
+            ) : (
+              <span aria-hidden />
+            )}
+            <ScoreBadge score={match.score} prediction={match.prediction} />
+          </CardContent>
+        )}
+
+        {!isClosed && (
+          <CardFooter className="justify-end">
+            <Button type="submit" size="sm" disabled={isPending || !dirty}>
+              {isPending ? "Salvando..." : savedTick ? "✓ Salvo" : "Salvar"}
+            </Button>
+          </CardFooter>
+        )}
       </form>
     </Card>
   );
