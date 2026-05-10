@@ -47,7 +47,7 @@ export function GoogleSignInButton({
       aria-label="Entrar com a conta Google"
     >
       <GoogleIcon />
-      {pending ? "Redirecionando..." : label}
+      {pending ? "Entrando..." : label}
     </Button>
   );
 }
