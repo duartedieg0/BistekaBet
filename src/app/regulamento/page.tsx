@@ -10,7 +10,14 @@ export default function RegulamentoPage() {
     <main className="mx-auto w-full max-w-3xl px-6 py-12">
       <PageHeader />
       <Toc />
-      {/* TODO: as 16 seções entram nas Tasks 2 e 3 */}
+      <Section1Objetivo />
+      <Section2Inscricao />
+      <Section3Palpites />
+      <Section4Horario />
+      <Section5Resultado />
+      <Section6Pontuacao />
+      <Section7VencedorComExemplos />
+      <Section8EmpateComExemplos />
     </main>
   );
 }
@@ -183,5 +190,184 @@ function PrizeTable() {
         </tbody>
       </table>
     </div>
+  );
+}
+
+function Section1Objetivo() {
+  return (
+    <Section id="objetivo" title="1. Objetivo">
+      <p>
+        Este regulamento define as regras oficiais do bolão BISTEKA BET da Copa
+        do Mundo 2026, incluindo envio de palpites, pontuação, critérios de
+        desempate, premiação e demais condições de participação.
+      </p>
+      <p>
+        O bolão será baseado nos palpites realizados pelos participantes para os
+        jogos da Copa do Mundo 2026, sempre considerando o placar do tempo
+        normal de cada partida.
+      </p>
+    </Section>
+  );
+}
+
+function Section2Inscricao() {
+  return (
+    <Section id="inscricao" title="2. Valor da inscrição">
+      <p>
+        O valor da inscrição no bolão será de <strong>R$ 75,00</strong>.
+      </p>
+      <p>
+        O prazo final para pagamento da inscrição será até o{" "}
+        <strong>início do primeiro jogo da competição</strong>.
+      </p>
+    </Section>
+  );
+}
+
+function Section3Palpites() {
+  return (
+    <Section id="palpites" title="3. Envio dos palpites">
+      <p>Os palpites deverão ser enviados exclusivamente pelo BISTEKA BET.</p>
+      <p>
+        Cada participante deverá informar o placar de cada jogo antes do
+        respectivo prazo limite.
+      </p>
+      <p>
+        O envio e a alteração dos palpites poderão ser feitos{" "}
+        <strong>até exatamente o horário oficial de início do jogo</strong>,
+        conforme indicado na tabela oficial do bolão.
+      </p>
+      <p>O controle do prazo será feito automaticamente pelo sistema.</p>
+      <p>
+        Após o bloqueio automático do sistema, o palpite não poderá mais ser
+        incluído ou alterado.
+      </p>
+      <p>
+        Caso o participante não envie o palpite dentro do prazo estabelecido,
+        receberá <strong>0 pontos</strong> no respectivo jogo.
+      </p>
+    </Section>
+  );
+}
+
+function Section4Horario() {
+  return (
+    <Section id="horario" title="4. Horário de referência">
+      <p>
+        O horário válido para envio, alteração e bloqueio dos palpites será
+        sempre o horário informado na tabela oficial do bolão.
+      </p>
+    </Section>
+  );
+}
+
+function Section5Resultado() {
+  return (
+    <Section id="resultado" title="5. Resultado considerado para pontuação">
+      <p>
+        Para fins de pontuação, será considerado apenas o placar ao final do{" "}
+        <strong>tempo normal</strong> da partida.
+      </p>
+      <p>
+        Gols marcados em <strong>prorrogação</strong> ou{" "}
+        <strong>disputa de pênaltis</strong> não serão considerados.
+      </p>
+      <p>
+        Nas fases eliminatórias, caso uma partida termine empatada no tempo
+        normal e uma seleção avance após prorrogação ou pênaltis, o resultado
+        válido para o bolão será o empate no tempo normal.
+      </p>
+    </Section>
+  );
+}
+
+function Section6Pontuacao() {
+  return (
+    <Section id="pontuacao" title="6. Pontuação geral">
+      <p>A pontuação será não cumulativa.</p>
+      <p>
+        Isso significa que o participante receberá apenas a maior pontuação
+        aplicável ao seu palpite, de acordo com a fase da competição e o tipo de
+        acerto.
+      </p>
+      <PointsTable />
+    </Section>
+  );
+}
+
+function Section7VencedorComExemplos() {
+  return (
+    <Section id="vencedor" title="7. Regras para jogos com vencedor">
+      <p>
+        Quando uma partida tiver um vencedor no tempo normal, o participante
+        poderá pontuar de três formas:
+      </p>
+
+      <h3 className="font-heading text-lg mt-4">7.1. Acerto do vencedor</h3>
+      <p>
+        Ocorre quando o participante acerta qual seleção venceu a partida, mas
+        não acerta o placar exato nem a quantidade de gols de uma das equipes.
+      </p>
+      <Example
+        result="Brasil 2 × 1 França"
+        prediction="Brasil 1 × 0 França"
+        conclusion="O participante acertou o vencedor da partida."
+      />
+
+      <h3 className="font-heading text-lg mt-4">
+        7.2. Acerto do vencedor + gols de 1 time
+      </h3>
+      <p>
+        Ocorre quando o participante acerta o vencedor da partida e também
+        acerta a quantidade de gols de pelo menos uma das seleções.
+      </p>
+      <Example
+        result="Brasil 2 × 1 França"
+        prediction="Brasil 3 × 1 França"
+        conclusion="O participante acertou o vencedor e a quantidade de gols da França."
+      />
+      <Example
+        result="Brasil 1 × 0 França"
+        prediction="Brasil 2 × 0 França"
+        conclusion="O participante acertou o vencedor e a quantidade de gols da França. A quantidade de 0 gols também é válida para essa regra."
+      />
+
+      <h3 className="font-heading text-lg mt-4">7.3. Acerto do placar exato</h3>
+      <p>Ocorre quando o participante acerta exatamente o placar da partida.</p>
+      <Example
+        result="Brasil 2 × 1 França"
+        prediction="Brasil 2 × 1 França"
+        conclusion="O participante acertou o placar exato e receberá apenas a pontuação correspondente, sem acumular outras."
+      />
+    </Section>
+  );
+}
+
+function Section8EmpateComExemplos() {
+  return (
+    <Section id="empate" title="8. Regras para jogos empatados">
+      <p>
+        Quando uma partida terminar empatada no tempo normal, existirão apenas
+        duas possibilidades de pontuação:
+      </p>
+      <ol className="list-decimal pl-6 space-y-1">
+        <li>Acerto do empate;</li>
+        <li>Acerto do placar exato.</li>
+      </ol>
+      <p>
+        Não haverá pontuação intermediária por acerto de quantidade de gols de
+        uma das equipes em jogos empatados.
+      </p>
+      <Example
+        result="Argentina 1 × 1 Alemanha"
+        prediction="Argentina 2 × 2 Alemanha"
+        conclusion="O participante acertou o empate, mas não o placar exato."
+      />
+      <Example
+        result="Argentina 1 × 1 Alemanha"
+        prediction="Argentina 1 × 1 Alemanha"
+        conclusion="O participante acertou o placar exato."
+      />
+    </Section>
   );
 }
