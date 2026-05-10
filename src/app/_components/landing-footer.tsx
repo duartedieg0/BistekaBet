@@ -15,7 +15,7 @@ export function LandingFooter() {
         <FooterCol
           title="Produto"
           links={[
-            { label: "Como funciona", href: "#como-funciona" },
+            { label: "Como funciona", href: "/#como-funciona" },
             { label: "Pontuação", href: "/regulamento#pontuacao" },
           ]}
         />
