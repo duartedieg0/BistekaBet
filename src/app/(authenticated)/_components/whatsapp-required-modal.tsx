@@ -58,8 +58,7 @@ export function WhatsappRequiredModal() {
             Falta um detalhe pra entrar no grupo
           </DialogTitle>
           <DialogDescription className="text-center leading-relaxed">
-            Pra te adicionar ao grupo do WhatsApp do bolão (avisos de jogos,
-            palpites e ranking), precisamos do seu número.
+            Pra te adicionar ao grupo do WhatsApp do bolão (avisos de jogos e ranking), precisamos do seu número.
           </DialogDescription>
         </div>
 
