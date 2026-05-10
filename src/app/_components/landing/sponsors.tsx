@@ -112,8 +112,8 @@ export function Sponsors() {
     return () => track.removeEventListener("scroll", onScroll);
   }, []);
 
-  const prev = () => scrollToIndex(Math.max(0, activeIndex - 1));
-  const next = () => scrollToIndex(Math.min(slots.length - 1, activeIndex + 1));
+  const prev = () => scrollToIndex((activeIndex - 1 + slots.length) % slots.length);
+  const next = () => scrollToIndex((activeIndex + 1) % slots.length);
 
   return (
     <section className="relative bg-secondary/40 py-24 sm:py-28">
@@ -127,7 +127,7 @@ export function Sponsors() {
           </h2>
           <p className="mt-4 text-lg text-muted-foreground">
             A Copa de 2026 dura 39 dias e todo apito final tem gente vidrada no
-            ranking. Sua marca pode estar lá no meio.
+            APP. Sua marca pode estar lá no meio.
           </p>
         </div>
 
@@ -166,7 +166,7 @@ export function Sponsors() {
                     <p className="text-sm leading-relaxed text-muted-foreground">
                       {slot.description}
                     </p>
-                    <ul className="mt-auto flex flex-col gap-2 border-t border-border/60 pt-4 text-sm">
+                    <ul className="mt-auto flex flex-col gap-2 text-sm">
                       {slot.perks.map((perk) => (
                         <li key={perk} className="flex items-start gap-2">
                           <span
@@ -187,9 +187,8 @@ export function Sponsors() {
             <button
               type="button"
               onClick={prev}
-              disabled={activeIndex === 0}
               aria-label="Pacote anterior"
-              className="inline-flex size-10 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-foreground hover:text-background disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-card disabled:hover:text-foreground"
+              className="inline-flex size-10 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-foreground hover:text-background"
             >
               <ChevronLeft className="size-5" />
             </button>
@@ -215,9 +214,8 @@ export function Sponsors() {
             <button
               type="button"
               onClick={next}
-              disabled={activeIndex === slots.length - 1}
               aria-label="Próximo pacote"
-              className="inline-flex size-10 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-foreground hover:text-background disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-card disabled:hover:text-foreground"
+              className="inline-flex size-10 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-foreground hover:text-background"
             >
               <ChevronRight className="size-5" />
             </button>
