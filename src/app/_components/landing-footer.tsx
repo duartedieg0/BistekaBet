@@ -30,7 +30,7 @@ export function LandingFooter() {
         <FooterCol
           title="Legal"
           links={[
-            { label: "Contato", href="https://wa.me/5547999680801?text=Olá!%20Quero%20saber%20mais%20sobre%20o%20Bisteka%20Bet."
+            { label: "Contato", href:"https://wa.me/5547999680801?text=Olá!%20Quero%20saber%20mais%20sobre%20o%20Bisteka%20Bet."
  },
           ]}
         />
