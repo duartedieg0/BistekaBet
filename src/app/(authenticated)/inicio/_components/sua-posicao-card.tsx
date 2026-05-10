@@ -1,0 +1,42 @@
+import { redirect } from "next/navigation";
+import { Trophy } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { createClient } from "@/lib/supabase/server";
+import { loadSuaPosicaoData } from "../_lib/sua-posicao-queries";
+
+export async function SuaPosicaoCard() {
+  const supabase = await createClient();
+  const { data: userData } = await supabase.auth.getUser();
+  if (!userData.user) redirect("/");
+
+  const { rank, totalPlayers, totalPoints, exactCount } = await loadSuaPosicaoData(
+    userData.user.id,
+  );
+  const hasPalpitado = totalPoints > 0;
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="inline-flex items-center gap-2 font-heading text-xl tracking-wide">
+          <Trophy className="size-5 text-primary" />
+          Sua posição
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="flex flex-col items-start gap-3">
+        <span className="font-heading text-6xl text-primary tabular leading-none">
+          {hasPalpitado ? `#${rank}` : "#—"}
+        </span>
+        {hasPalpitado ? (
+          <span className="text-sm text-muted-foreground">
+            de {totalPlayers} · {exactCount} cravado{exactCount === 1 ? "" : "s"}
+          </span>
+        ) : (
+          <span className="text-sm text-muted-foreground">
+            Você ainda não palpitou. Comece pela primeira partida para entrar no
+            ranking.
+          </span>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
