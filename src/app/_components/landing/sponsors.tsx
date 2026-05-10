@@ -227,7 +227,7 @@ export function Sponsors() {
             Quer fechar um pacote ou montar um formato custom? Fale com a gente.
           </p>
           <a
-            href="https://wa.me/5547999999999?text=Olá!%20Quero%20saber%20mais%20sobre%20os%20pacotes%20de%20patrocínio%20do%20Bisteka%20Bet."
+            href="https://wa.me/5547999680801?text=Olá!%20Quero%20saber%20mais%20sobre%20os%20pacotes%20de%20patrocínio%20do%20Bisteka%20Bet."
             target="_blank"
             className={
               buttonVariants({ variant: "default", size: "lg" }) +

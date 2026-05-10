@@ -13,19 +13,19 @@ const steps = [
     title: "Entre",
     body: `Login em 1 clique com sua conta Google e pague a inscrição de ${formatBRL(
       INSCRIPTION_VALUE_BRL,
-    )} até o primeiro jogo da Copa.`,
+    )} até o início da Copa.`,
   },
   {
     n: "02",
     icon: Target,
     title: "Palpite",
-    body: `Palpite os ${COMPETITION.totalMatches} jogos. Editável até o horário oficial de início de cada partida — só o tempo normal conta.`,
+    body: `Palpite os ${COMPETITION.totalMatches} jogos. Editável até o horário oficial de início de cada partida`,
   },
   {
     n: "03",
     icon: Trophy,
     title: "Ganhe",
-    body: "Pontuação cresce a cada fase. Top 3 leva camisa da Seleção Brasileira + 50%, 35% e 15% do prêmio em dinheiro.",
+    body: "Pontuação cresce a cada fase. Tem emoção até a final.",
   },
 ];
 
@@ -43,10 +43,6 @@ export function HowItWorks() {
           <h2 className="mt-3 font-heading text-4xl tracking-tight sm:text-5xl">
             Três passos até a taça do bolão
           </h2>
-          <p className="mt-4 text-lg text-muted-foreground">
-            Sem planilha de Excel, sem mensagem perdida no grupo. Tudo num lugar
-            só.
-          </p>
         </div>
 
         <ol className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

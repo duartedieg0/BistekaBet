@@ -28,18 +28,15 @@ export function FinalCta() {
         <h2 className="font-heading text-5xl uppercase leading-[0.95] tracking-tight sm:text-6xl md:text-7xl">
           A Copa começa.{" "}
           <span className="text-[oklch(0.85_0.18_85)]">
-            E o seu bolão também.
+            E a resenha também.
           </span>
         </h2>
         <p className="max-w-2xl text-lg text-white/70">
-          Login em um clique, inscrição até o primeiro jogo, e cada apito final
-          mexendo no ranking. Top 3 fecha o pódio com camisa da Seleção
-          Brasileira na mochila.
+          Faça seu login com um clique
         </p>
         <GoogleSignInButton size="lg" variant="accent" />
         <p className="text-xs text-white/40">
-          Inscrição {formatBRL(INSCRIPTION_VALUE_BRL)} · Top 3 leva camisa do
-          Brasil + bolada · Sem app pra instalar
+          Inscrição {formatBRL(INSCRIPTION_VALUE_BRL)}
         </p>
       </div>
     </section>

@@ -19,7 +19,7 @@ const items = [
   },
   {
     q: "Como funciona a pontuação?",
-    a: "A pontuação varia por fase e cresce conforme avança a Copa: começa em 2 pontos por acerto de vencedor na fase de grupos e chega a 34 pontos por placar exato na final. A pontuação não é cumulativa — você leva apenas a maior aplicável ao seu palpite. Tabela completa no regulamento.",
+    a: "A pontuação varia por fase e cresce conforme avança a Copa: começa em 2 pontos por acerto de vencedor na fase de grupos e chega a 34 pontos por placar exato na final. Tabela completa no regulamento.",
   },
   {
     q: "E se a partida tiver prorrogação ou pênaltis?",
@@ -27,7 +27,7 @@ const items = [
   },
   {
     q: "Como é a premiação?",
-    a: "Os 3 primeiros levam, cada um, 1 camisa da Seleção Brasileira. O custo das camisas sai do total arrecadado e o valor líquido é dividido em 50% / 35% / 15% entre 1º, 2º e 3º. Se mais gente entrar, a organização pode ampliar a quantidade de premiados.",
+    a: "Os 3 primeiros levam, cada um, 1 camisa da Seleção Brasileira. O valor líquido é dividido em 50% / 35% / 15% entre 1º, 2º e 3º. Se mais gente entrar, a organização pode ampliar a quantidade de premiados.",
   },
   {
     q: "E se empatar a pontuação no final?",

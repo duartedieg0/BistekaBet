@@ -28,7 +28,7 @@ export function Hero({ errorMessage }: { errorMessage?: string | null }) {
 
           <h1 className="font-heading text-5xl uppercase leading-[0.92] tracking-tight sm:text-6xl md:text-7xl lg:text-[5.75rem]">
             Bolão da Copa{" "}
-            <span className="text-[oklch(0.85_0.18_85)]">com sangue no olho.</span>
+            <span className="text-[oklch(0.85_0.18_85)]">sangue no olho.</span>
           </h1>
 
           <p className="max-w-xl text-lg text-white/70 sm:text-xl">
