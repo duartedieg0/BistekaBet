@@ -3,7 +3,7 @@ import {
   saoPauloDayRange,
   formatSaoPauloDayLabel,
 } from "@/lib/dates/sao-paulo-day";
-import { formatKickoff } from "../sao-paulo-day";
+import { formatKickoff, toSaoPauloInputValue } from "../sao-paulo-day";
 
 describe("saoPauloDayRange", () => {
   it("retorna início e fim do dia em SP convertidos para UTC", () => {
@@ -49,5 +49,15 @@ describe("formatKickoff", () => {
 
   it("formats midnight BRT correctly", () => {
     expect(formatKickoff("2026-06-16T03:00:00Z")).toBe("16/06 00:00");
+  });
+});
+
+describe("toSaoPauloInputValue", () => {
+  it("formats UTC ISO into datetime-local value in BRT", () => {
+    expect(toSaoPauloInputValue("2026-06-15T19:00:00Z")).toBe("2026-06-15T16:00");
+  });
+
+  it("handles BRT day rollover", () => {
+    expect(toSaoPauloInputValue("2026-06-16T02:00:00Z")).toBe("2026-06-15T23:00");
   });
 });
