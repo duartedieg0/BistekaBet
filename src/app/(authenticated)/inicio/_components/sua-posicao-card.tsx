@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { Trophy } from "lucide-react";
+import { Target, Trophy } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/server";
 import { loadSuaPosicaoData } from "../_lib/sua-posicao-queries";
@@ -23,12 +23,23 @@ export async function SuaPosicaoCard() {
         </CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col items-start gap-3">
-        <span className="font-heading text-6xl text-primary tabular leading-none">
-          {hasPalpitado ? `#${rank}` : "#—"}
-        </span>
+        <div className="flex items-baseline gap-2">
+          <span className="font-heading text-6xl text-primary tabular leading-none">
+            {hasPalpitado ? `#${rank}` : "#—"}
+          </span>
+          {hasPalpitado ? (
+            <span className="text-sm text-muted-foreground">
+              de {totalPlayers}
+            </span>
+          ) : null}
+        </div>
         {hasPalpitado ? (
-          <span className="text-sm text-muted-foreground">
-            de {totalPlayers} · {exactCount} cravado{exactCount === 1 ? "" : "s"}
+          <span
+            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground"
+            aria-label={`${exactCount} cravado${exactCount === 1 ? "" : "s"}`}
+          >
+            <Target className="size-4 text-primary" aria-hidden />
+            {exactCount}
           </span>
         ) : (
           <span className="text-sm text-muted-foreground">
