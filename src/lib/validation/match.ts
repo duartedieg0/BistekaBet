@@ -10,6 +10,7 @@ const optionalNonNegativeInt = z
 
 export const updateMatchSchema = z
   .object({
+    // kickoff_at chega aqui como ISO UTC (já convertido de BRT pelo action).
     kickoff_at: z.string().min(1),
     venue: z.string().nullable().optional().transform((v) => v ?? null),
     home_team_id: z.string().uuid().nullable().optional().transform((v) => v ?? null),

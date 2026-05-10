@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { recomputeMatchScores } from "@/lib/scoring/recompute";
 import { updateMatchSchema } from "@/lib/validation/match";
+import { fromSaoPauloInputValue } from "@/lib/dates/sao-paulo-day";
 
 function parseIntOrNull(v: FormDataEntryValue | null): number | null {
   if (v === null || v === "") return null;
@@ -13,8 +14,16 @@ function parseIntOrNull(v: FormDataEntryValue | null): number | null {
 }
 
 export async function updateMatch(matchId: string, formData: FormData) {
+  const kickoffNaive = formData.get("kickoff_at") as string;
+  let kickoffIso: string;
+  try {
+    kickoffIso = fromSaoPauloInputValue(kickoffNaive);
+  } catch {
+    throw new Error("Formato de data inválido.");
+  }
+
   const raw = {
-    kickoff_at: formData.get("kickoff_at") as string,
+    kickoff_at: kickoffIso,
     venue: (formData.get("venue") as string) || null,
     home_team_id: (formData.get("home_team_id") as string) || null,
     away_team_id: (formData.get("away_team_id") as string) || null,
