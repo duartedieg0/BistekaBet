@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { flagSrc } from "@/lib/flags";
 import type { MatchWithPrediction } from "@/lib/types/prediction";
 import { savePrediction } from "../_actions";
 import { bracketSlotLabel } from "../_lib/bracket-labels";
@@ -123,10 +124,12 @@ export function MatchPredictionCard({ match }: { match: MatchWithPrediction }) {
         </CardHeader>
 
         <CardContent className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 pt-1">
-          <TeamSlot label={homeLabel} code={homeCode} flagUrl={match.home_team?.flag_url ?? null} align="end" />
+          <TeamSlot label={homeLabel} code={homeCode} align="end" />
           <div className="flex items-center gap-2">
             <Input
               type="number"
+              inputMode="numeric"
+              pattern="[0-9]*"
               min={0}
               value={home}
               onChange={(e) => setHome(e.target.value)}
@@ -137,6 +140,8 @@ export function MatchPredictionCard({ match }: { match: MatchWithPrediction }) {
             <span className="font-heading text-xl text-muted-foreground" aria-hidden>×</span>
             <Input
               type="number"
+              inputMode="numeric"
+              pattern="[0-9]*"
               min={0}
               value={away}
               onChange={(e) => setAway(e.target.value)}
@@ -145,7 +150,7 @@ export function MatchPredictionCard({ match }: { match: MatchWithPrediction }) {
               className="w-14 text-center tabular"
             />
           </div>
-          <TeamSlot label={awayLabel} code={awayCode} flagUrl={match.away_team?.flag_url ?? null} align="start" />
+          <TeamSlot label={awayLabel} code={awayCode} align="start" />
         </CardContent>
 
         {!isClosed && knockoutNeedsAdvance ? (
@@ -198,7 +203,7 @@ export function MatchPredictionCard({ match }: { match: MatchWithPrediction }) {
 
         {isClosed && (
           <CardContent className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 pt-0 pb-3">
-            <span className="text-xs uppercase tracking-widest text-muted-foreground justify-self-end text-right">
+            <span className="text-xs uppercase tracking-widest text-muted-foreground justify-self-start text-left">
               {match.status === "cancelled"
                 ? "Partida cancelada"
                 : match.status === "postponed"
@@ -221,7 +226,7 @@ export function MatchPredictionCard({ match }: { match: MatchWithPrediction }) {
             ) : (
               <span aria-hidden />
             )}
-            <div className="justify-self-start">
+            <div className="justify-self-end">
               <ScoreBadge score={match.score} prediction={match.prediction} />
             </div>
           </CardContent>
@@ -239,7 +244,22 @@ export function MatchPredictionCard({ match }: { match: MatchWithPrediction }) {
   );
 }
 
-function TeamSlot({ label, code, flagUrl, align }: { label: string; code: string; flagUrl: string | null; align: "start" | "end" }) {
+function TeamSlot({ label, code, align }: { label: string; code: string; align: "start" | "end" }) {
+  const flag = flagSrc(code, 80);
+  const flagEl = flag ? (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={flag}
+      alt=""
+      width={24}
+      height={18}
+      loading="lazy"
+      className="h-[18px] w-6 rounded-sm object-cover shrink-0"
+    />
+  ) : (
+    <span className="h-[18px] w-6 rounded-sm bg-muted shrink-0" aria-hidden />
+  );
+
   return (
     <div className={cn("flex items-center gap-2 min-w-0", align === "end" ? "justify-end" : "justify-start")}>
       {align === "end" ? (
@@ -248,21 +268,11 @@ function TeamSlot({ label, code, flagUrl, align }: { label: string; code: string
             <span className="hidden sm:inline">{label}</span>
             <span className="font-mono text-xs text-muted-foreground sm:ml-1">{code}</span>
           </span>
-          {flagUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={flagUrl} alt="" className="size-6 rounded-sm shrink-0" />
-          ) : (
-            <span className="size-6 rounded-sm bg-muted shrink-0" aria-hidden />
-          )}
+          {flagEl}
         </>
       ) : (
         <>
-          {flagUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={flagUrl} alt="" className="size-6 rounded-sm shrink-0" />
-          ) : (
-            <span className="size-6 rounded-sm bg-muted shrink-0" aria-hidden />
-          )}
+          {flagEl}
           <span className="text-sm truncate" title={label}>
             <span className="font-mono text-xs text-muted-foreground sm:mr-1">{code}</span>
             <span className="hidden sm:inline">{label}</span>

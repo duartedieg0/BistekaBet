@@ -114,7 +114,7 @@ export function AuthHeader({ profile }: { profile: Profile }) {
 
       <nav
         aria-label="Navegação principal"
-        className="border-t border-border md:hidden"
+        className="md:hidden"
       >
         <div className="mx-auto flex max-w-7xl items-center gap-1 overflow-x-auto px-4 py-2">
           {NAV.map((item) => (

@@ -48,7 +48,7 @@ export default async function PalpitesPage({
             Tabela de jogos
           </h1>
           <p className="text-muted-foreground">
-            Faça seu palpite em cada partida da Copa 2026.
+            Faça seus palpites.
           </p>
         </div>
         {filtered.length > 0 ? (

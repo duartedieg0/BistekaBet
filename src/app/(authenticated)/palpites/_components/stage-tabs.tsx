@@ -20,13 +20,15 @@ export function StageTabs({ current, groupCode }: { current: Stage; groupCode?: 
           router.push(href);
         }}
       >
-        <TabsList className="flex-wrap h-auto">
-          {STAGES.map((s) => (
-            <TabsTrigger key={s} value={s}>
-              {STAGE_LABELS[s]}
-            </TabsTrigger>
-          ))}
-        </TabsList>
+        <div className="-mx-1 overflow-x-auto px-1 pb-1">
+          <TabsList className="max-w-none">
+            {STAGES.map((s) => (
+              <TabsTrigger key={s} value={s} className="flex-none shrink-0">
+                {STAGE_LABELS[s]}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </div>
       </Tabs>
 
       {current === "group" ? (
