@@ -111,6 +111,31 @@ export function AuthHeader({ profile }: { profile: Profile }) {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+
+      <nav
+        aria-label="Navegação principal"
+        className="border-t border-border md:hidden"
+      >
+        <div className="mx-auto flex max-w-7xl items-center gap-1 overflow-x-auto px-4 py-2">
+          {NAV.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="inline-flex h-10 shrink-0 items-center rounded-md px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:bg-muted"
+            >
+              {item.label}
+            </Link>
+          ))}
+          {profile.role === "admin" && (
+            <Link
+              href="/admin"
+              className="ml-1 inline-flex h-10 shrink-0 items-center rounded-md border border-destructive/30 bg-destructive/10 px-3 text-sm font-semibold uppercase tracking-wider text-destructive transition-colors hover:bg-destructive/15"
+            >
+              Admin
+            </Link>
+          )}
+        </div>
+      </nav>
     </header>
   );
 }

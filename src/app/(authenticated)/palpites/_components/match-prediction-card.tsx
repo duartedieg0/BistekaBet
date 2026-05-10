@@ -197,8 +197,8 @@ export function MatchPredictionCard({ match }: { match: MatchWithPrediction }) {
         ) : null}
 
         {isClosed && (
-          <CardContent className="flex items-center justify-between gap-3 pt-0 pb-3">
-            <span className="text-xs uppercase tracking-widest text-muted-foreground">
+          <CardContent className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 pt-0 pb-3">
+            <span className="text-xs uppercase tracking-widest text-muted-foreground justify-self-end text-right">
               {match.status === "cancelled"
                 ? "Partida cancelada"
                 : match.status === "postponed"
@@ -212,7 +212,7 @@ export function MatchPredictionCard({ match }: { match: MatchWithPrediction }) {
             match.status !== "cancelled" &&
             match.status !== "postponed" ? (
               <span
-                className="font-heading text-lg tabular-nums"
+                className="font-heading text-lg tabular-nums justify-self-center"
                 aria-label={`Resultado oficial: ${match.home_score} a ${match.away_score}`}
               >
                 {match.home_score} <span className="opacity-50">×</span>{" "}
@@ -221,12 +221,14 @@ export function MatchPredictionCard({ match }: { match: MatchWithPrediction }) {
             ) : (
               <span aria-hidden />
             )}
-            <ScoreBadge score={match.score} prediction={match.prediction} />
+            <div className="justify-self-start">
+              <ScoreBadge score={match.score} prediction={match.prediction} />
+            </div>
           </CardContent>
         )}
 
         {!isClosed && (
-          <CardFooter className="justify-end">
+          <CardFooter className="justify-end border-t-0 bg-transparent">
             <Button type="submit" size="sm" disabled={isPending || !dirty}>
               {isPending ? "Salvando..." : savedTick ? "✓ Salvo" : "Salvar"}
             </Button>
