@@ -1,8 +1,9 @@
-import { CalendarDays, Flame, Trophy } from "lucide-react";
+import { Flame, Trophy } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RankingPreview } from "./_components/ranking-preview";
+import { UpcomingMatchesSection } from "./_components/upcoming-matches-section";
 
 export default function InicioPage() {
   return (
@@ -25,24 +26,7 @@ export default function InicioPage() {
       </header>
 
       <section className="grid gap-5 lg:grid-cols-[2fr_1fr]">
-        <Card>
-          <CardHeader className="flex-row items-center justify-between gap-2">
-            <CardTitle className="inline-flex items-center gap-2 font-heading text-xl tracking-wide">
-              <CalendarDays className="size-5 text-primary" />
-              Seus próximos jogos
-            </CardTitle>
-            <Badge variant="secondary">3 abertos</Badge>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-3">
-            <Skeleton className="h-20 w-full rounded-lg" />
-            <Skeleton className="h-20 w-full rounded-lg" />
-            <Skeleton className="h-20 w-full rounded-lg" />
-            <p className="pt-2 text-center text-sm text-muted-foreground">
-              Os jogos da Copa 2026 vão aparecer aqui assim que a tabela for
-              publicada.
-            </p>
-          </CardContent>
-        </Card>
+        <UpcomingMatchesSection />
 
         <div className="flex flex-col gap-5">
           <Card>
