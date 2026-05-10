@@ -2,8 +2,10 @@ import { describe, it, expect } from "vitest";
 import {
   saoPauloDayRange,
   formatSaoPauloDayLabel,
+  formatKickoff,
+  toSaoPauloInputValue,
+  fromSaoPauloInputValue,
 } from "@/lib/dates/sao-paulo-day";
-import { formatKickoff, toSaoPauloInputValue, fromSaoPauloInputValue } from "../sao-paulo-day";
 
 describe("saoPauloDayRange", () => {
   it("retorna início e fim do dia em SP convertidos para UTC", () => {
