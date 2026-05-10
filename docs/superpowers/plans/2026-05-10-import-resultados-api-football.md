@@ -30,8 +30,7 @@
 **Modify:**
 - `src/app/(authenticated)/admin/_actions.ts` — add `previewImport()` and `commitImport(entries)` server actions
 - `src/app/(authenticated)/admin/page.tsx` — render `<ImportResultsCard />` next to `<RecomputeScoresCard />`
-- `src/lib/types/match.ts` — add `api_football_id?: number | null` to `Match`
-- `src/lib/types/team.ts` (or wherever `Team` lives) — add `api_football_id?: number | null`
+- `src/lib/types/match.ts` — add `api_football_id: number | null` em ambas as interfaces `Match` e `Team` (as duas vivem nesse mesmo arquivo)
 - `.env.local.example` — document `API_FOOTBALL_KEY`, `API_FOOTBALL_LEAGUE_ID`, `API_FOOTBALL_SEASON`
 
 ---
@@ -103,32 +102,24 @@ git commit -m "feat(db): api_football_id em teams/matches + tabela import_runs"
 ## Task 2 — Update TypeScript row types
 
 **Files:**
-- Modify: `src/lib/types/match.ts`
-- Modify: `src/lib/types/team.ts` (or the file where `Team` is exported — verify before editing)
+- Modify: `src/lib/types/match.ts` (este arquivo exporta tanto `Match` quanto `Team`)
 
-- [ ] **Step 1: Add `api_football_id` to `Match`**
+- [ ] **Step 1: Add `api_football_id` em `Match` e `Team`**
 
-In `src/lib/types/match.ts`, add to the `Match` interface:
+No arquivo `src/lib/types/match.ts`, adicionar em ambas as interfaces:
 ```ts
 api_football_id: number | null;
 ```
 
-- [ ] **Step 2: Add `api_football_id` to `Team`**
-
-Find the file exporting `Team` (`Grep` for `export interface Team` or `export type Team`). Add:
-```ts
-api_football_id: number | null;
-```
-
-- [ ] **Step 3: Type-check**
+- [ ] **Step 2: Type-check**
 
 Run: `pnpm tsc --noEmit`
-Expected: no new errors. (If existing code does `select('*')` and reuses the type, the optional shape avoids breakage.)
+Expected: no new errors.
 
-- [ ] **Step 4: Commit**
+- [ ] **Step 3: Commit**
 
 ```bash
-git add src/lib/types/
+git add src/lib/types/match.ts
 git commit -m "types: api_football_id em Team e Match"
 ```
 
@@ -538,15 +529,16 @@ export type DbMatchSlim = {
   status: "postponed" | "cancelled" | null;
 };
 
-const SCORE_FIELDS: Array<keyof DiffEntry["changes"][number] & string> = [];
-const FIELDS: Array<keyof MatchPatch & DiffEntry["changes"][number]["field"]> = [
+type Field = DiffEntry["changes"][number]["field"];
+
+const FIELDS: Field[] = [
   "home_score", "away_score",
   "home_score_et", "away_score_et",
   "home_pens", "away_pens",
   "winner_team_id", "status",
 ];
 
-const SCORE_SET = new Set([
+const SCORE_FIELDS: ReadonlySet<Field> = new Set<Field>([
   "home_score", "away_score", "home_score_et", "away_score_et",
   "home_pens", "away_pens", "winner_team_id",
 ]);
@@ -560,7 +552,7 @@ export function buildDiffEntry(db: DbMatchSlim, patch: MatchPatch): DiffEntry | 
     const to = (patch as Record<string, unknown>)[field];
     if (from !== to) {
       changes.push({ field, from, to });
-      if (SCORE_SET.has(field)) willRecompute = true;
+      if (SCORE_FIELDS.has(field)) willRecompute = true;
     }
   }
 
@@ -671,7 +663,9 @@ git commit -m "feat(api-football): fetch wrapper com Zod e env config"
 **Files:**
 - Modify: `src/app/(authenticated)/admin/_actions.ts`
 
-Read the existing file first to mirror auth/admin-check style. Use `createClient` (authenticated, for the admin check) AND `createAdminClient` (service role, for writes that bypass RLS where needed for `import_runs`/`matches` updates within transaction context — verify which the rest of the file uses for similar admin writes; mirror that pattern).
+Padrão estabelecido em `_actions.ts` (verificado): **anon client (`createClient`)** para o check de auth/admin via `is_admin` RPC; **admin client (`createAdminClient`)** para writes que precisam bypassar RLS. Use exatamente isso.
+
+**Atenção (não-transacional):** O cliente JS do Supabase não abre transação. O commit faz `update` linha-a-linha + insert em `import_runs`. Em caso de falha parcial: alguns matches atualizam, outros não, e a row de `import_runs` é inserida com a contagem real (`matches_errored` reflete falhas). Aceitável porque o run é re-executável e o `import_runs.diff` registra a tentativa para auditoria.
 
 - [ ] **Step 1: Read the existing actions file**
 
@@ -723,8 +717,14 @@ export async function previewImport(): Promise<PreviewImportResult> {
       .not("api_football_id", "is", null);
     if (mErr) throw mErr;
 
-    const byApiId = new Map<number, typeof matches[number]>();
-    for (const m of matches ?? []) byApiId.set(m.api_football_id as number, m);
+    // Supabase types relations as arrays por padrao; normalizamos para single-object via cast.
+    type MatchRow = NonNullable<typeof matches>[number] & {
+      home_team: { name: string; api_football_id: number | null } | null;
+      away_team: { name: string; api_football_id: number | null } | null;
+    };
+    const rows = (matches ?? []) as unknown as MatchRow[];
+    const byApiId = new Map<number, MatchRow>();
+    for (const m of rows) byApiId.set(m.api_football_id as number, m);
 
     const fixtures = await fetchFixtures();
     const entries: DiffEntry[] = [];
@@ -739,8 +739,8 @@ export async function previewImport(): Promise<PreviewImportResult> {
       const db: DbMatchSlim = {
         id: m.id,
         api_football_id: m.api_football_id,
-        home_team_name: (m.home_team as { name: string } | null)?.name ?? "?",
-        away_team_name: (m.away_team as { name: string } | null)?.name ?? "?",
+        home_team_name: m.home_team?.name ?? "?",
+        away_team_name: m.away_team?.name ?? "?",
         home_score: m.home_score, away_score: m.away_score,
         home_score_et: m.home_score_et, away_score_et: m.away_score_et,
         home_pens: m.home_pens, away_pens: m.away_pens,
