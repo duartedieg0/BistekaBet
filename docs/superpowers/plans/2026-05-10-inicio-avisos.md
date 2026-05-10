@@ -194,11 +194,17 @@ Sem teste unitário (segue o padrão do projeto para queries Supabase, e.g., `_l
 
 - [ ] **Step 3.1: Adicionar `AvisosData` type e `loadAvisosData`**
 
-Append ao `avisos-queries.ts` (NÃO remover `computePointsPossible`):
+Editar `avisos-queries.ts` mantendo `computePointsPossible` intacto:
+- **Adicionar imports no topo do arquivo** (junto dos imports já existentes da Task 2):
+  ```ts
+  import type { SupabaseClient } from "@supabase/supabase-js";
+  import { getInicioDayMatches } from "./queries";
+  ```
+- **Adicionar o restante** (constante, tipos, helper privado e `loadAvisosData`) **abaixo** de `computePointsPossible`.
+
+Bloco para adicionar (sem repetir os imports já listados):
 
 ```ts
-import type { SupabaseClient } from "@supabase/supabase-js";
-import { getInicioDayMatches } from "./queries";
 
 const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
 
@@ -237,6 +243,8 @@ type FinalizedMatchRow = {
   away_score: number | null;
 };
 
+// "Finalizado" segundo o spec: placar oficial preenchido E status NÃO é postponed/cancelled.
+// Outros valores possíveis (null, "rescheduled") contam como finalizados.
 function isFinalized(row: { home_score: number | null; away_score: number | null; status: string | null }): boolean {
   if (row.home_score === null || row.away_score === null) return false;
   if (row.status === "postponed" || row.status === "cancelled") return false;
@@ -340,7 +348,7 @@ export async function loadAvisosData(
 }
 ```
 
-> **Importante:** o import de `Stage` no topo do arquivo já existe (Task 2). Adicione apenas os imports de `SupabaseClient` e `getInicioDayMatches`.
+> Resumo dos imports a adicionar no topo do arquivo: `import type { SupabaseClient } from "@supabase/supabase-js";` e `import { getInicioDayMatches } from "./queries";`. O import de `Stage` e `POINTS_TABLE` já existem da Task 2.
 
 - [ ] **Step 3.2: Type-check**
 
@@ -543,78 +551,14 @@ git commit -m "feat(inicio): add static avisos sub-components"
 
 ---
 
-## Task 6: `NextMatchCountdown` (client) com TDD
+## Task 6: `NextMatchCountdown` (client)
 
 **Files:**
 - Create: `src/app/(authenticated)/inicio/_components/avisos/next-match-countdown.tsx`
-- Test: `src/app/(authenticated)/inicio/_components/avisos/__tests__/next-match-countdown.test.tsx`
 
-- [ ] **Step 6.1: Failing test**
+**Sem teste de componente.** Razão: o projeto não tem `@testing-library/react`, `jsdom`, nem `@testing-library/jest-dom` instalados, e `vitest.config.ts` está em `environment: "node"` com `include: ["src/**/__tests__/**/*.test.ts"]` (não pega `.test.tsx`). A lógica de tempo do componente já é coberta por `formatCountdown` (Task 1); o componente em si é glue (`useEffect` + `setInterval`). Cobertura adicional fica para o smoke manual da Task 10. Se quiser instalar testing-library no futuro, é spec separado.
 
-```tsx
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { render, screen, act } from "@testing-library/react";
-import { NextMatchCountdown } from "../next-match-countdown";
-
-describe("NextMatchCountdown", () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date("2026-06-12T12:00:00Z"));
-  });
-
-  afterEach(() => {
-    vi.useRealTimers();
-  });
-
-  it("SSR/inicial mostra placeholder --:--:--", () => {
-    const kickoff = "2026-06-12T14:43:17Z"; // +2h43m17s
-    const { container } = render(
-      <NextMatchCountdown
-        match={{ id: "m1", homeCode: "BRA", awayCode: "ARG", kickoffAt: kickoff }}
-      />,
-    );
-    // O componente client mostra placeholder antes do useEffect rodar.
-    // Em testing-library, o effect roda síncrono no act do render — então pode já ter computado.
-    // Permitimos qualquer um dos dois estados.
-    const text = container.textContent ?? "";
-    expect(text).toMatch(/(02:43:1[6-7]|--:--:--)/);
-    expect(screen.getByText(/BRA × ARG/)).toBeInTheDocument();
-  });
-
-  it("após tick, countdown decresce", () => {
-    const kickoff = "2026-06-12T12:00:10Z"; // +10s
-    render(
-      <NextMatchCountdown
-        match={{ id: "m1", homeCode: "BRA", awayCode: "ARG", kickoffAt: kickoff }}
-      />,
-    );
-    act(() => {
-      vi.advanceTimersByTime(1000);
-    });
-    expect(screen.getByText("00:09")).toBeInTheDocument();
-    act(() => {
-      vi.advanceTimersByTime(2000);
-    });
-    expect(screen.getByText("00:07")).toBeInTheDocument();
-  });
-});
-```
-
-> **Nota:** se `@testing-library/react` ou `@testing-library/jest-dom` ainda não estiverem instalados, usar `Bash`: `npx jsdom --version` para checar; se faltar, **STOP e reportar** — instalação requer decisão sobre dev dependency. Outros testes do projeto usam apenas vitest puro? Verificar com `grep -r "@testing-library" package.json`.
-
-**Pré-checagem:**
-
-```bash
-grep -E "testing-library|jsdom" package.json
-```
-
-Se não houver `@testing-library/react`, ajustar o teste para uma forma alternativa: testar apenas o helper `formatCountdown` (já feito) e fazer um teste de renderização básica usando `renderToString` de `react-dom/server` para confirmar o placeholder. **Reporte qualquer ajuste antes de seguir.**
-
-- [ ] **Step 6.2: Run, expect FAIL**
-
-`npx vitest run "src/app/(authenticated)/inicio/_components/avisos/__tests__/next-match-countdown.test.tsx"` → FAIL.
-
-- [ ] **Step 6.3: Implement**
+- [ ] **Step 6.1: Implement**
 
 ```tsx
 "use client";
@@ -644,12 +588,14 @@ export function NextMatchCountdown({ match }: { match: Match }) {
   return (
     <div
       role="status"
-      aria-live="polite"
       className="flex items-start gap-3 rounded-md border border-red-500/40 bg-red-500/10 p-3"
     >
       <Timer className="mt-0.5 size-4 shrink-0 text-red-500" aria-hidden />
       <div className="flex flex-col gap-1 text-sm">
-        <span className="font-heading text-2xl text-foreground tabular-nums leading-none">
+        <span
+          aria-live="polite"
+          className="font-heading text-2xl text-foreground tabular-nums leading-none"
+        >
           {label}
         </span>
         <span className="text-muted-foreground">
@@ -661,16 +607,16 @@ export function NextMatchCountdown({ match }: { match: Match }) {
 }
 ```
 
-- [ ] **Step 6.4: Run, expect PASS**
+> Nota: `aria-live="polite"` está no `<span>` do número (alinhado com o spec) — leitor anuncia mudanças do tempo sem bombardear, mas o role do container é `status`.
 
-`npx vitest run "src/app/(authenticated)/inicio/_components/avisos/__tests__/next-match-countdown.test.tsx"` → 2 specs passando.
+- [ ] **Step 6.2: Type-check**
 
-> Se o teste 1 falhar porque o `useEffect` no `render` já populou o label imediatamente, ajustar o assertion para `toMatch(/(02:43:1[6-7])/)` apenas (drop placeholder branch). Não tornar o teste do tick mais frouxo.
+`npx tsc --noEmit` → 0 errors.
 
-- [ ] **Step 6.5: Commit**
+- [ ] **Step 6.3: Commit**
 
 ```bash
-git add "src/app/(authenticated)/inicio/_components/avisos/next-match-countdown.tsx" "src/app/(authenticated)/inicio/_components/avisos/__tests__/next-match-countdown.test.tsx"
+git add "src/app/(authenticated)/inicio/_components/avisos/next-match-countdown.tsx"
 git commit -m "feat(inicio): add NextMatchCountdown client component with live timer"
 ```
 
@@ -849,13 +795,17 @@ Substituir os dois `<Card>` laterais (Sua posição mockada com `#—` e Aposta 
 
 - [ ] **Step 9.1: Editar**
 
-1. Substituir imports:
-   - REMOVER: `Flame`, `Trophy` de `lucide-react` (não são mais usados aqui — Trophy fica no SuaPosicaoCard).
-   - REMOVER: `Skeleton` import (não é mais usado).
-   - REMOVER: `Card`, `CardContent`, `CardHeader`, `CardTitle` (já não são usados em page.tsx — laterais viraram componentes).
+**Antes de tudo:** ler o arquivo atual com `Read` e confirmar quais imports continuam em uso após a substituição. A lista abaixo reflete o estado conhecido (após implementação da Task 9 do plano anterior); confirme com a leitura.
+
+1. Substituir imports (verificar uso antes de remover cada um):
+   - REMOVER: `Flame`, `Trophy` de `lucide-react` (Trophy passa a ser usado dentro de `SuaPosicaoCard`; Flame era do "Aposta da rodada").
+   - REMOVER: `Skeleton` (era usado só pela "Aposta da rodada").
+   - REMOVER: `Card`, `CardContent`, `CardHeader`, `CardTitle` (somente os Cards laterais usavam; o resto da página não envolve em `<Card>`).
    - MANTER: `Badge` (usado pelo `<Badge variant="upcoming">Pré-Copa</Badge>` no header).
    - ADICIONAR: `import { SuaPosicaoCard } from "./_components/sua-posicao-card";`
    - ADICIONAR: `import { AvisosCard } from "./_components/avisos-card";`
+
+> Se o `Read` mostrar algum import sendo usado fora do que está documentado acima (pouco provável), **mantenha-o** e reporte a divergência.
 
 2. Substituir o bloco `<div className="flex flex-col gap-5">...</div>` pela versão com os novos componentes.
 
@@ -907,7 +857,7 @@ git commit -m "feat(inicio): wire SuaPosicaoCard and AvisosCard into home page"
 npm test
 ```
 
-Expected: TODOS os testes passando — `formatCountdown` (3), `computePointsPossible` (3), `NextMatchCountdown` (2) novos + 87 pré-existentes = 95+. Sem regressões.
+Expected: TODOS os testes passando — `formatCountdown` (3) + `computePointsPossible` (3) novos + 87 pré-existentes = 93. Sem regressões.
 
 - [ ] **Step 10.2: Type-check final**
 
