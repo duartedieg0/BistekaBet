@@ -36,10 +36,10 @@ export async function SuaPosicaoCard() {
         {hasPalpitado ? (
           <span
             className="inline-flex items-center gap-1.5 text-sm text-muted-foreground"
-            aria-label={`${exactCount} cravado${exactCount === 1 ? "" : "s"}`}
+            aria-label={`${exactCount} na mosca`}
           >
             <Target className="size-4 text-primary" aria-hidden />
-            {exactCount}
+            {exactCount} Na mosca
           </span>
         ) : (
           <span className="text-sm text-muted-foreground">
