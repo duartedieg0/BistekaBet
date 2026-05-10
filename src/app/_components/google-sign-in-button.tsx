@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { createClient } from "@/lib/supabase/client";
+import { useGoogleSignIn } from "@/app/_components/use-google-sign-in";
 
 type Variant = "default" | "accent" | "outline";
 type Size = "default" | "sm" | "lg";
@@ -20,28 +19,13 @@ export function GoogleSignInButton({
   label = "Entrar com Google",
   className,
 }: Props) {
-  const [supabase] = useState(() => createClient());
-  const [pending, setPending] = useState(false);
-
-  async function handleClick() {
-    setPending(true);
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=/inicio`,
-      },
-    });
-    if (error) {
-      console.error("OAuth init failed", error);
-      setPending(false);
-    }
-  }
+  const { signIn, pending } = useGoogleSignIn();
 
   return (
     <Button
       variant={variant}
       size={size}
-      onClick={handleClick}
+      onClick={signIn}
       disabled={pending}
       className={className}
       aria-label="Entrar com a conta Google"

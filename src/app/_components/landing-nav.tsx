@@ -36,11 +36,7 @@ export function LandingNav() {
           </a>
         </nav>
 
-        <GoogleSignInButton
-          size="default"
-          label="Entrar"
-          className="hidden sm:inline-flex"
-        />
+        <GoogleSignInButton size="default" label="Entrar" className="ml-auto" />
       </div>
     </header>
   );
