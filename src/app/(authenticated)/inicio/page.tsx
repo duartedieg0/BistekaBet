@@ -20,7 +20,7 @@ export default function InicioPage() {
           </p>
         </div>
         <Badge variant="upcoming" className="h-7 px-3 text-xs">
-          Pré-Copa · faltam 31 dias
+          Pré-Copa
         </Badge>
       </header>
 

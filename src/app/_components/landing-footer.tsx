@@ -17,7 +17,6 @@ export function LandingFooter() {
           links={[
             { label: "Como funciona", href: "#como-funciona" },
             { label: "Pontuação", href: "/regulamento#pontuacao" },
-            { label: "Criar bolão", href: "#" },
           ]}
         />
         <FooterCol
@@ -31,9 +30,8 @@ export function LandingFooter() {
         <FooterCol
           title="Legal"
           links={[
-            { label: "Termos", href: "#" },
-            { label: "Privacidade", href: "#" },
-            { label: "Contato", href: "#" },
+            { label: "Contato", href="https://wa.me/5547999680801?text=Olá!%20Quero%20saber%20mais%20sobre%20o%20Bisteka%20Bet."
+ },
           ]}
         />
       </div>
@@ -48,7 +46,7 @@ export function LandingFooter() {
               height={20}
               className="size-5 object-contain"
             />
-            Bolão da Copa 2026 · feito por torcedores
+            Bolão da Copa 2026 · feito por diversão
           </span>
         </div>
       </div>

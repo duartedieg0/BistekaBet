@@ -79,7 +79,7 @@ export function RankingTable({ rows }: { rows: RankingRow[] }) {
         </TableBody>
       </Table>
       <p className="mt-3 text-xs text-muted-foreground">
-        Top 3 levam 1 camisa da Seleção Brasileira.{" "}
+        Top 3 levam uma camisa da Seleção Brasileira.{" "}
         <Link
           href="/regulamento#premiacao"
           className="underline hover:text-foreground"
