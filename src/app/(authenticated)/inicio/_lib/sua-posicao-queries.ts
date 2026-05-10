@@ -16,12 +16,15 @@ export async function loadSuaPosicaoData(userId: string): Promise<SuaPosicaoData
     loadRanking(),
     supabase
       .from("prediction_scores")
-      .select("id", { count: "exact", head: true })
+      .select("prediction_id", { count: "exact", head: true })
       .eq("user_id", userId)
       .eq("tier", "exact"),
   ]);
 
-  if (exactRes.error) throw exactRes.error;
+  if (exactRes.error) {
+    console.error("[suaPosicao] exact", exactRes.error);
+    throw new Error(`suaPosicao.exact: ${JSON.stringify(exactRes.error)}`);
+  }
 
   const row = ranking.find((r) => r.user_id === userId);
   const rank = row?.rank ?? ranking.length + 1;

@@ -101,11 +101,11 @@ export async function loadAvisosData(
     paidP, nextUnpredictedP, dayMatchesP, awaitingP, earnedP, finalizedP,
   ]);
 
-  if (paidR.error) throw paidR.error;
-  if (nextR.error) throw nextR.error;
-  if (awaitingR.error) throw awaitingR.error;
-  if (earnedR.error) throw earnedR.error;
-  if (finalizedR.error) throw finalizedR.error;
+  if (paidR.error) { console.error("[avisos] paid", paidR.error); throw new Error(`paid: ${JSON.stringify(paidR.error)}`); }
+  if (nextR.error) { console.error("[avisos] nextUnpredicted", nextR.error); throw new Error(`nextUnpredicted: ${JSON.stringify(nextR.error)}`); }
+  if (awaitingR.error) { console.error("[avisos] awaiting", awaitingR.error); throw new Error(`awaiting: ${JSON.stringify(awaitingR.error)}`); }
+  if (earnedR.error) { console.error("[avisos] earned", earnedR.error); throw new Error(`earned: ${JSON.stringify(earnedR.error)}`); }
+  if (finalizedR.error) { console.error("[avisos] finalized", finalizedR.error); throw new Error(`finalized: ${JSON.stringify(finalizedR.error)}`); }
 
   const paid = paidR.data?.paid ?? false;
 
