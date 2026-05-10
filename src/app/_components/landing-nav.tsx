@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { buttonVariants } from "@/components/ui/button";
+import { GoogleSignInButton } from "@/app/_components/google-sign-in-button";
 
 export function LandingNav() {
   return (
@@ -31,14 +31,16 @@ export function LandingNav() {
           <a className="transition-colors hover:text-white" href="#faq">
             FAQ
           </a>
+          <a className="transition-colors hover:text-white" href="/regulamento">
+            Regulamento
+          </a>
         </nav>
 
-        <a
-          href="#cta"
-          className={buttonVariants({ variant: "accent" }) + " hidden sm:inline-flex"}
-        >
-          Entrar
-        </a>
+        <GoogleSignInButton
+          size="default"
+          label="Entrar"
+          className="hidden sm:inline-flex"
+        />
       </div>
     </header>
   );
