@@ -1,5 +1,24 @@
 const TZ = "America/Sao_Paulo";
 
+const SAO_PAULO_INPUT_RE =
+  /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?$/;
+
+export function fromSaoPauloInputValue(value: string): string {
+  const m = SAO_PAULO_INPUT_RE.exec(value);
+  if (!m) {
+    throw new Error(`Formato inválido para datetime BRT: "${value}"`);
+  }
+  const [, y, mo, d, h, mi, s] = m;
+  return new Date(Date.UTC(
+    Number(y),
+    Number(mo) - 1,
+    Number(d),
+    Number(h) + 3,
+    Number(mi),
+    s ? Number(s) : 0,
+  )).toISOString();
+}
+
 function saoPauloYmd(date: Date): { y: number; m: number; d: number } {
   const parts = new Intl.DateTimeFormat("en-CA", {
     timeZone: TZ,

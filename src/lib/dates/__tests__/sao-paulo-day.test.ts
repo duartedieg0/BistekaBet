@@ -3,7 +3,7 @@ import {
   saoPauloDayRange,
   formatSaoPauloDayLabel,
 } from "@/lib/dates/sao-paulo-day";
-import { formatKickoff, toSaoPauloInputValue } from "../sao-paulo-day";
+import { formatKickoff, toSaoPauloInputValue, fromSaoPauloInputValue } from "../sao-paulo-day";
 
 describe("saoPauloDayRange", () => {
   it("retorna início e fim do dia em SP convertidos para UTC", () => {
@@ -59,5 +59,40 @@ describe("toSaoPauloInputValue", () => {
 
   it("handles BRT day rollover", () => {
     expect(toSaoPauloInputValue("2026-06-16T02:00:00Z")).toBe("2026-06-15T23:00");
+  });
+});
+
+describe("fromSaoPauloInputValue", () => {
+  it("converts naive BRT string to UTC ISO", () => {
+    expect(fromSaoPauloInputValue("2026-06-15T16:00")).toBe("2026-06-15T19:00:00.000Z");
+  });
+
+  it("accepts optional seconds (some browsers emit them)", () => {
+    expect(fromSaoPauloInputValue("2026-06-15T16:00:00")).toBe("2026-06-15T19:00:00.000Z");
+    expect(fromSaoPauloInputValue("2026-06-15T16:00:30")).toBe("2026-06-15T19:00:30.000Z");
+  });
+
+  it("keeps the same calendar day for early-morning BRT", () => {
+    expect(fromSaoPauloInputValue("2026-06-15T00:30")).toBe("2026-06-15T03:30:00.000Z");
+  });
+
+  it("rolls into next UTC day for late-night BRT", () => {
+    expect(fromSaoPauloInputValue("2026-06-15T23:00")).toBe("2026-06-16T02:00:00.000Z");
+  });
+
+  it("throws on invalid format", () => {
+    expect(() => fromSaoPauloInputValue("invalid")).toThrow();
+    expect(() => fromSaoPauloInputValue("2026-06-15")).toThrow();
+  });
+
+  it("round-trips at minute boundaries", () => {
+    const samples = [
+      "2026-06-15T19:00:00.000Z",
+      "2026-06-16T02:00:00.000Z",
+      "2026-06-15T03:30:00.000Z",
+    ];
+    for (const iso of samples) {
+      expect(fromSaoPauloInputValue(toSaoPauloInputValue(iso))).toBe(iso);
+    }
   });
 });
