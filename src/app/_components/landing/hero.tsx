@@ -3,6 +3,15 @@ import { Trophy, Zap } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { GoogleSignInButton } from "../google-sign-in-button";
+import {
+  COMPETITION,
+  INSCRIPTION_VALUE_BRL,
+  PHASE_POINTS,
+  formatBRL,
+} from "@/lib/bolao-config";
+
+const FINAL_EXACT_POINTS =
+  PHASE_POINTS.find((p) => p.key === "final")?.exactScore ?? 34;
 
 export function Hero({ errorMessage }: { errorMessage?: string | null }) {
   return (
@@ -14,7 +23,7 @@ export function Hero({ errorMessage }: { errorMessage?: string | null }) {
             variant="outline"
             className="border-white/20 bg-white/5 text-xs uppercase tracking-widest text-[oklch(0.85_0.18_85)] backdrop-blur"
           >
-            <Zap className="size-3" /> Copa 2026 · 11 jun → 19 jul
+            <Zap className="size-3" /> Copa 2026 · {COMPETITION.startLabel} → {COMPETITION.endLabel}
           </Badge>
 
           <h1 className="font-heading text-5xl uppercase leading-[0.92] tracking-tight sm:text-6xl md:text-7xl lg:text-[5.75rem]">
@@ -23,8 +32,9 @@ export function Hero({ errorMessage }: { errorMessage?: string | null }) {
           </h1>
 
           <p className="max-w-xl text-lg text-white/70 sm:text-xl">
-            Entre no bolão com seus amigos, palpite todos os 104 jogos da Copa
-            do Mundo de 2026 e veja quem leva a bisteca a cada apito final.
+            Palpite os {COMPETITION.totalMatches} jogos da Copa, suba no ranking
+            a cada apito final e dispute a camisa da Seleção Brasileira + bolada
+            em dinheiro pro pódio da Patota Bisteka.
           </p>
 
           <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
@@ -45,21 +55,27 @@ export function Hero({ errorMessage }: { errorMessage?: string | null }) {
               <dt className="text-xs uppercase tracking-widest text-white/40">
                 Jogos
               </dt>
-              <dd className="font-heading text-3xl text-white tabular">104</dd>
+              <dd className="font-heading text-3xl text-white tabular">
+                {COMPETITION.totalMatches}
+              </dd>
             </div>
             <div className="h-10 w-px bg-white/10" aria-hidden />
             <div className="flex flex-col">
               <dt className="text-xs uppercase tracking-widest text-white/40">
                 Países
               </dt>
-              <dd className="font-heading text-3xl text-white tabular">48</dd>
+              <dd className="font-heading text-3xl text-white tabular">
+                {COMPETITION.totalCountries}
+              </dd>
             </div>
             <div className="h-10 w-px bg-white/10" aria-hidden />
             <div className="flex flex-col">
               <dt className="text-xs uppercase tracking-widest text-white/40">
-                Custo
+                Inscrição
               </dt>
-              <dd className="font-heading text-3xl text-white">Grátis</dd>
+              <dd className="font-heading text-3xl text-white tabular">
+                {formatBRL(INSCRIPTION_VALUE_BRL)}
+              </dd>
             </div>
           </dl>
 
@@ -160,7 +176,7 @@ function Scoreboard() {
 
         <div className="mt-6 grid grid-cols-3 gap-3 border-t border-white/10 pt-4 text-xs">
           <Stat label="Seu palpite" value="2 × 1" hit />
-          <Stat label="Pontos" value="+25" />
+          <Stat label="Pontos" value={`+${FINAL_EXACT_POINTS}`} />
           <Stat label="Rank" value="#3" />
         </div>
       </div>

@@ -25,8 +25,8 @@ export function LandingNav() {
           <a className="transition-colors hover:text-white" href="#como-funciona">
             Como funciona
           </a>
-          <a className="transition-colors hover:text-white" href="#prova">
-            Depoimentos
+          <a className="transition-colors hover:text-white" href="#patrocinio">
+            Patrocínio
           </a>
           <a className="transition-colors hover:text-white" href="#faq">
             FAQ

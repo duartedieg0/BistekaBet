@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { GoogleSignInButton } from "../google-sign-in-button";
+import { INSCRIPTION_VALUE_BRL, formatBRL } from "@/lib/bolao-config";
 
 export function FinalCta() {
   return (
@@ -31,12 +32,14 @@ export function FinalCta() {
           </span>
         </h2>
         <p className="max-w-2xl text-lg text-white/70">
-          Login em um clique. Convida a galera. Curte cada apito final
-          conferindo se subiu ou caiu no ranking.
+          Login em um clique, inscrição até o primeiro jogo, e cada apito final
+          mexendo no ranking. Top 3 fecha o pódio com camisa da Seleção
+          Brasileira na mochila.
         </p>
         <GoogleSignInButton size="lg" variant="accent" />
         <p className="text-xs text-white/40">
-          Sem cartão · Sem cadastro · Sem app pra instalar
+          Inscrição {formatBRL(INSCRIPTION_VALUE_BRL)} · Top 3 leva camisa do
+          Brasil + bolada · Sem app pra instalar
         </p>
       </div>
     </section>

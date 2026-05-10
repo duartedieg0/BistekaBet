@@ -2,6 +2,12 @@
 // Ao alterar o regulamento, atualizar AMBOS os arquivos.
 
 import type { ReactNode } from "react";
+import {
+  INSCRIPTION_VALUE_BRL,
+  PHASE_POINTS,
+  PRIZE_SPLIT,
+  formatBRL,
+} from "@/lib/bolao-config";
 
 export function RegulamentoContent() {
   return (
@@ -128,15 +134,6 @@ function Example({
 }
 
 function PointsTable() {
-  const rows: Array<[string, number, number, number]> = [
-    ["Fase de grupos", 2, 4, 7],
-    ["32 avos", 3, 6, 10],
-    ["Oitavas", 4, 8, 13],
-    ["Quartas", 6, 11, 18],
-    ["Semifinal", 8, 15, 25],
-    ["3º lugar", 7, 13, 22],
-    ["Final", 11, 20, 34],
-  ];
   return (
     <div className="my-4 overflow-x-auto rounded-md border">
       <table
@@ -152,12 +149,12 @@ function PointsTable() {
           </tr>
         </thead>
         <tbody>
-          {rows.map(([fase, w, wg, ex]) => (
-            <tr key={fase} className="border-t hover:bg-muted/50">
-              <td className="p-3">{fase}</td>
-              <td className="p-3 text-right tabular-nums">{w}</td>
-              <td className="p-3 text-right tabular-nums">{wg}</td>
-              <td className="p-3 text-right tabular-nums">{ex}</td>
+          {PHASE_POINTS.map((phase) => (
+            <tr key={phase.key} className="border-t hover:bg-muted/50">
+              <td className="p-3">{phase.label}</td>
+              <td className="p-3 text-right tabular-nums">{phase.winnerOrDraw}</td>
+              <td className="p-3 text-right tabular-nums">{phase.winnerPlusGoals}</td>
+              <td className="p-3 text-right tabular-nums">{phase.exactScore}</td>
             </tr>
           ))}
         </tbody>
@@ -177,24 +174,14 @@ function PrizeTable() {
           </tr>
         </thead>
         <tbody>
-          <tr className="border-t">
-            <td className="p-3">1º lugar</td>
-            <td className="p-3">
-              1 camisa da Seleção Brasileira + 50% do valor líquido
-            </td>
-          </tr>
-          <tr className="border-t">
-            <td className="p-3">2º lugar</td>
-            <td className="p-3">
-              1 camisa da Seleção Brasileira + 35% do valor líquido
-            </td>
-          </tr>
-          <tr className="border-t">
-            <td className="p-3">3º lugar</td>
-            <td className="p-3">
-              1 camisa da Seleção Brasileira + 15% do valor líquido
-            </td>
-          </tr>
+          {PRIZE_SPLIT.map((prize) => (
+            <tr key={prize.place} className="border-t">
+              <td className="p-3">{prize.label}</td>
+              <td className="p-3">
+                1 camisa da Seleção Brasileira + {prize.percentage}% do valor líquido
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>
@@ -222,7 +209,8 @@ function Section2Inscricao() {
   return (
     <Section id="inscricao" title="2. Valor da inscrição">
       <p>
-        O valor da inscrição no bolão será de <strong>R$ 75,00</strong>.
+        O valor da inscrição no bolão será de{" "}
+        <strong>{formatBRL(INSCRIPTION_VALUE_BRL)}</strong>.
       </p>
       <p>
         O prazo final para pagamento da inscrição será até o{" "}
@@ -505,7 +493,7 @@ function Section16Resumo() {
   return (
     <Section id="resumo" title="16. Resumo das principais regras">
       <ul className="list-disc pl-6 space-y-1">
-        <li>Valor da inscrição: <strong>R$ 75,00</strong>;</li>
+        <li>Valor da inscrição: <strong>{formatBRL(INSCRIPTION_VALUE_BRL)}</strong>;</li>
         <li>Palpites enviados exclusivamente pelo webapp oficial;</li>
         <li>Palpites podem ser enviados ou alterados até exatamente o horário oficial de início do jogo;</li>
         <li>Palpite não enviado dentro do prazo vale <strong>0 pontos</strong>;</li>

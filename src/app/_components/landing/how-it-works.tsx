@@ -1,24 +1,31 @@
 import { LogIn, Target, Trophy } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  COMPETITION,
+  INSCRIPTION_VALUE_BRL,
+  formatBRL,
+} from "@/lib/bolao-config";
 
 const steps = [
   {
     n: "01",
     icon: LogIn,
     title: "Entre",
-    body: "Login em 1 clique com sua conta Google. Nada de senha, nada de cadastro chato.",
+    body: `Login em 1 clique com sua conta Google e pague a inscrição de ${formatBRL(
+      INSCRIPTION_VALUE_BRL,
+    )} até o primeiro jogo da Copa.`,
   },
   {
     n: "02",
     icon: Target,
     title: "Palpite",
-    body: "Dê seu palpite para todos os jogos. Editável até o apito inicial de cada partida.",
+    body: `Palpite os ${COMPETITION.totalMatches} jogos. Editável até o horário oficial de início de cada partida — só o tempo normal conta.`,
   },
   {
     n: "03",
     icon: Trophy,
     title: "Ganhe",
-    body: "Pontos a cada acerto, ranking ao vivo e a glória de fechar o pódio entre os amigos.",
+    body: "Pontuação cresce a cada fase. Top 3 leva camisa da Seleção Brasileira + 50%, 35% e 15% do prêmio em dinheiro.",
   },
 ];
 

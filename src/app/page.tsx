@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Hero } from "./_components/landing/hero";
 import { HowItWorks } from "./_components/landing/how-it-works";
-import { SocialProof } from "./_components/landing/social-proof";
+import { Sponsors } from "./_components/landing/sponsors";
 import { Faq } from "./_components/landing/faq";
 import { FinalCta } from "./_components/landing/final-cta";
 import { LandingFooter } from "./_components/landing-footer";
@@ -34,8 +34,8 @@ export default async function Home({
       <main className="flex flex-col">
         <Hero errorMessage={errorMessage} />
         <HowItWorks />
-        <section id="prova">
-          <SocialProof />
+        <section id="patrocinio">
+          <Sponsors />
         </section>
         <section id="faq">
           <Faq />
