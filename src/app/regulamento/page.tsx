@@ -18,6 +18,14 @@ export default function RegulamentoPage() {
       <Section6Pontuacao />
       <Section7VencedorComExemplos />
       <Section8EmpateComExemplos />
+      <Section9TerceiroLugar />
+      <Section10Adiados />
+      <Section11Classificacao />
+      <Section12Desempate />
+      <Section13Premiacao />
+      <Section14AumentoPremiados />
+      <Section15CasosOmissos />
+      <Section16Resumo />
     </main>
   );
 }
@@ -368,6 +376,153 @@ function Section8EmpateComExemplos() {
         prediction="Argentina 1 × 1 Alemanha"
         conclusion="O participante acertou o placar exato."
       />
+    </Section>
+  );
+}
+
+function Section9TerceiroLugar() {
+  return (
+    <Section id="terceiro" title="9. Jogo de 3º lugar">
+      <p>O jogo de disputa de 3º lugar fará parte do bolão.</p>
+      <p>
+        A pontuação do jogo de 3º lugar será menor que a pontuação da final,
+        conforme tabela oficial de pontuação.
+      </p>
+    </Section>
+  );
+}
+
+function Section10Adiados() {
+  return (
+    <Section id="adiados" title="10. Jogos adiados, suspensos ou remarcados">
+      <p>
+        Em caso de jogo adiado, suspenso ou remarcado, o palpite enviado
+        continuará válido, salvo se a organização decidir reabrir os palpites e
+        comunicar os participantes.
+      </p>
+      <p>
+        A organização poderá atualizar a tabela do bolão conforme alterações
+        oficiais da Copa do Mundo.
+      </p>
+    </Section>
+  );
+}
+
+function Section11Classificacao() {
+  return (
+    <Section id="classificacao" title="11. Classificação">
+      <p>A classificação do bolão será atualizada automaticamente pelo sistema.</p>
+      <p>
+        A pontuação de cada participante será calculada com base nos resultados
+        oficiais considerados pelo bolão e nas regras de pontuação definidas
+        neste regulamento.
+      </p>
+    </Section>
+  );
+}
+
+function Section12Desempate() {
+  return (
+    <Section id="desempate" title="12. Critérios de desempate">
+      <p>
+        Em caso de empate na pontuação total ao final do bolão, serão aplicados
+        os seguintes critérios, nesta ordem:
+      </p>
+      <ol className="list-decimal pl-6 space-y-1">
+        <li>Maior número de placares exatos em todo o torneio;</li>
+        <li>Maior número de placares exatos nas fases eliminatórias;</li>
+        <li>Maior número de acertos de vencedor ou empate em todo o torneio;</li>
+        <li>Maior pontuação obtida na final;</li>
+        <li>Maior pontuação somada nas semifinais, disputa de 3º lugar e final;</li>
+        <li>Persistindo o empate, o vencedor será definido por sorteio.</li>
+      </ol>
+      <p>Para o segundo critério, serão consideradas fases eliminatórias:</p>
+      <ul className="list-disc pl-6 space-y-1">
+        <li>32 avos;</li>
+        <li>Oitavas;</li>
+        <li>Quartas;</li>
+        <li>Semifinais;</li>
+        <li>Disputa de 3º lugar;</li>
+        <li>Final.</li>
+      </ul>
+    </Section>
+  );
+}
+
+function Section13Premiacao() {
+  return (
+    <Section id="premiacao" title="13. Premiação">
+      <p>
+        A premiação inicial do bolão será destinada aos três primeiros
+        colocados da classificação final.
+      </p>
+      <p>
+        Cada um dos três primeiros colocados receberá{" "}
+        <strong>1 camisa da Seleção Brasileira</strong>.
+      </p>
+      <p>
+        O custo das três camisas será descontado do valor total arrecadado
+        antes da divisão da premiação em dinheiro.
+      </p>
+      <p>
+        Após o desconto referente às camisas, o valor líquido restante será
+        distribuído da seguinte forma:
+      </p>
+      <PrizeTable />
+    </Section>
+  );
+}
+
+function Section14AumentoPremiados() {
+  return (
+    <Section id="aumento" title="14. Aumento da quantidade de premiados">
+      <p>
+        Caso a quantidade de participantes inscritos aumente, a organização
+        poderá ampliar a quantidade de pessoas premiadas e ajustar a
+        distribuição da premiação.
+      </p>
+      <p>
+        Qualquer alteração na quantidade de premiados ou na divisão dos prêmios
+        será comunicada aos participantes antes do início do bolão.
+      </p>
+    </Section>
+  );
+}
+
+function Section15CasosOmissos() {
+  return (
+    <Section id="omissos" title="15. Casos omissos">
+      <p>
+        Casos omissos ou situações não previstas neste regulamento serão
+        analisados e decididos pela organização do bolão, sempre buscando
+        preservar a transparência e a igualdade entre os participantes.
+      </p>
+    </Section>
+  );
+}
+
+function Section16Resumo() {
+  return (
+    <Section id="resumo" title="16. Resumo das principais regras">
+      <ul className="list-disc pl-6 space-y-1">
+        <li>Valor da inscrição: <strong>R$ 75,00</strong>;</li>
+        <li>Palpites enviados exclusivamente pelo webapp oficial;</li>
+        <li>Palpites podem ser enviados ou alterados até exatamente o horário oficial de início do jogo;</li>
+        <li>Palpite não enviado dentro do prazo vale <strong>0 pontos</strong>;</li>
+        <li>Apenas o placar do tempo normal será considerado;</li>
+        <li>Prorrogação e pênaltis não contam;</li>
+        <li>Pontuação não cumulativa;</li>
+        <li>Em jogos empatados, só há pontuação por empate ou placar exato;</li>
+        <li>0 gol conta como quantidade de gols acertada em jogos com vencedor;</li>
+        <li>O jogo de 3º lugar faz parte do bolão;</li>
+        <li>A classificação será atualizada automaticamente;</li>
+        <li>A premiação inicial será para os 3 primeiros colocados;</li>
+        <li>Cada um dos 3 primeiros colocados receberá 1 camisa da Seleção Brasileira;</li>
+        <li>O valor das camisas será descontado antes da divisão do prêmio em dinheiro;</li>
+        <li>O valor líquido será dividido em 50%, 35% e 15%;</li>
+        <li>A quantidade de premiados poderá aumentar caso haja mais participantes;</li>
+        <li>Casos omissos serão decididos pela organização.</li>
+      </ul>
     </Section>
   );
 }
