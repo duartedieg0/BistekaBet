@@ -13,7 +13,7 @@
 | 3 | Granularidade: 1 chamada que busca todas fixtures da Copa; diff aplica só o que mudou |
 | 4 | Sobrescrita: dry-run com modal de diff e confirmação explícita |
 | 5 | UX: card no dashboard `/admin` (sem duplicar em `/admin/partidas`) |
-| 6 | Sincroniza apenas `home_score`, `away_score`, ET, pênaltis, `winner_team_id` e `status`. `kickoff_at` permanece como cadastrado manualmente |
+| 6 | Sincroniza apenas `home_score`, `away_score`, ET, pênaltis, `winner_team_id` e `status` (mapeado, ver §3.1). `kickoff_at` permanece como cadastrado manualmente |
 | 7 | Auditoria: tabela `import_runs` (sem UI de histórico nesta fase) |
 
 **Decisões implícitas:**
@@ -23,7 +23,7 @@
 
 ## 1. Schema
 
-Migration nova `00X_api_football_ids.sql`:
+Migration nova `013_api_football_ids.sql`:
 
 ```sql
 alter table public.teams add column api_football_id bigint unique;
@@ -58,14 +58,15 @@ src/
       mapper.ts          # API fixture -> patch de matches (score, status, winner)
       diff.ts            # compara fixture mapeada com row atual, gera DiffEntry[]
   app/(authenticated)/admin/
-    _actions.ts          # server actions: previewImport(), commitImport(diffId)
+    _actions.ts          # server actions: previewImport(), commitImport(entries)
+                         # arquivo ja existe; adicionar essas duas actions nele
     _components/
       import-results-card.tsx   # card no dashboard, abre modal
       import-diff-dialog.tsx    # modal: lista DiffEntry[], botão confirmar
 scripts/
   seed-api-football-ids.ts      # roda 1x: GET /teams + match por nome -> grava api_football_id
 supabase/sql/
-  00X_api_football_ids.sql
+  013_api_football_ids.sql
 ```
 
 **Env vars (server-side, nunca `NEXT_PUBLIC_`):**
@@ -74,6 +75,21 @@ supabase/sql/
 - `API_FOOTBALL_SEASON` — `2026`
 
 ## 3. Fluxo do import
+
+### 3.1. Mapeamento de `status` (crítico)
+
+A coluna `matches.status` (em `supabase/sql/002_init_teams_matches.sql:56`) tem CHECK constraint que aceita apenas `'postponed'`, `'cancelled'` ou `null`. Os valores brutos da API (`FT/AET/PEN/PST/CANC/...`) **não** podem ser gravados diretamente. O `mapper` aplica:
+
+| API `status.short` | `matches.status` gravado |
+|---|---|
+| `FT`, `AET`, `PEN` | `null` (placar não-nulo já sinaliza finalização) |
+| `PST` (postponed) | `'postponed'` |
+| `CANC` (cancelled) | `'cancelled'` |
+| `NS`, `TBD`, `LIVE`, `HT`, `1H`, `2H`, qualquer outro | partida pulada (não entra no diff) |
+
+Importante: se uma partida estava `'postponed'` e agora a API retorna `FT`, o import deve gravar `status = null` (limpando o flag) junto com os placares — isso entra no diff como `status: 'postponed' → null`.
+
+O Zod schema em `client.ts` deve usar `z.enum([...])` com a lista completa documentada acima, não `z.string()`, para que mudança de schema da API dispare erro de validação (intenção da decisão 4).
 
 ### Fase preview (clique no botão "Importar resultados")
 
@@ -105,7 +121,7 @@ type DiffEntry = {
 
 3. Server Action `commitImport(entries)`:
    - Verifica admin (RLS + checagem explícita).
-   - Verifica rate-limit: se última `import_runs` foi há < 30s, retorna erro.
+   - Verifica rate-limit (apenas no commit, não no preview): se última `import_runs` foi há < 30s, retorna erro.
    - Em transação:
      - Para cada entry, aplica `update matches set ... where id = entry.matchId` (apenas campos com `from !== to`).
      - Insere row em `import_runs` com contagens + payload `diff` em jsonb.
@@ -118,7 +134,8 @@ type DiffEntry = {
 |---|---|
 | Fixture com `teams.home.id` ausente em `teams.api_football_id` | Pula, conta em `errored`, registra em `diff` com `reason: 'team_not_mapped'` |
 | Match com placeholder mata-mata (sem `api_football_id`) | Não casa; não aparece no diff; sem erro |
-| Status `PST` / `CANC` | Reflete em `matches.status`; placares ficam `null` |
+| Status `PST` / `CANC` | Mapeia para `'postponed'` / `'cancelled'` (ver §3.1); placares ficam `null` |
+| Match estava `postponed` mas agora API retorna `FT`/`AET`/`PEN` | Grava `status = null` + placares (entra no diff como `status: 'postponed' → null`) |
 | Status `NS` / `TBD` (não começou) | Pula |
 | Status `LIVE` / `HT` / `1H` / `2H` | Pula (MVP só importa finalizadas) |
 | API 5xx / timeout | Server Action retorna erro tipado; toast "API indisponível" |
