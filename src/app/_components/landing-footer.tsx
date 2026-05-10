@@ -16,7 +16,7 @@ export function LandingFooter() {
           title="Produto"
           links={[
             { label: "Como funciona", href: "#como-funciona" },
-            { label: "Pontuação", href: "#" },
+            { label: "Pontuação", href: "/regulamento#pontuacao" },
             { label: "Criar bolão", href: "#" },
           ]}
         />
@@ -24,7 +24,7 @@ export function LandingFooter() {
           title="Recursos"
           links={[
             { label: "Calendário Copa 2026", href: "#" },
-            { label: "Regras oficiais", href: "#" },
+            { label: "Regras oficiais", href: "/regulamento" },
             { label: "Status", href: "#" },
           ]}
         />
