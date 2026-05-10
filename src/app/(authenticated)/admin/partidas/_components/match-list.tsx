@@ -3,6 +3,7 @@ import { deriveMatchStatus } from "@/lib/match-status";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import type { Match, Team } from "@/lib/types/match";
 import { RescheduledBadge } from "@/app/(authenticated)/palpites/_components/rescheduled-badge";
+import { formatKickoff } from "@/lib/dates/sao-paulo-day";
 
 export type MatchWithTeams = Match & {
   home_team: Pick<Team, "id" | "code" | "name"> | null;
@@ -52,7 +53,7 @@ export function MatchList({ matches }: { matches: MatchWithTeams[] }) {
             <TableRow key={m.id}>
               <TableCell>
                 <span className="inline-flex items-center gap-2">
-                  {new Date(m.kickoff_at).toLocaleString("pt-BR")}
+                  {formatKickoff(m.kickoff_at)}
                   <RescheduledBadge originalKickoff={m.original_kickoff_at} />
                 </span>
               </TableCell>

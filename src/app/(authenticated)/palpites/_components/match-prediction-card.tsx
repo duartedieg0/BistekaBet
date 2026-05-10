@@ -14,6 +14,7 @@ import { bracketSlotLabel } from "../_lib/bracket-labels";
 import { useGroupSave } from "./group-save-form";
 import { ScoreBadge } from "./score-badge";
 import { RescheduledBadge } from "./rescheduled-badge";
+import { formatKickoff } from "@/lib/dates/sao-paulo-day";
 
 export function MatchPredictionCard({ match }: { match: MatchWithPrediction }) {
   const isKnockout = match.stage !== "group";
@@ -99,12 +100,7 @@ export function MatchPredictionCard({ match }: { match: MatchWithPrediction }) {
     });
   }
 
-  const kickoffLabel = new Date(match.kickoff_at).toLocaleString("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  const kickoffLabel = formatKickoff(match.kickoff_at);
 
   const statusBadge = isClosed ? (
     <Badge variant="secondary">Encerrado</Badge>

@@ -1,12 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-
-const fmt = (iso: string) =>
-  new Date(iso).toLocaleString("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+import { formatKickoff } from "@/lib/dates/sao-paulo-day";
 
 export function RescheduledBadge({
   originalKickoff,
@@ -18,7 +11,7 @@ export function RescheduledBadge({
     <Badge
       variant="outline"
       className="text-muted-foreground"
-      title={`Originalmente: ${fmt(originalKickoff)}`}
+      title={`Originalmente: ${formatKickoff(originalKickoff)}`}
     >
       Remarcado
     </Badge>
