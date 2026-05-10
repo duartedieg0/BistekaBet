@@ -11,8 +11,8 @@ A infra existe:
 - `profiles.paid` (boolean) — status de pagamento por usuário (admin atualiza via toggle).
 - `predictions` — palpites do usuário.
 - `prediction_scores` — `(prediction_id, user_id, points, tier)` com `tier ∈ {"exact","winner_or_draw","miss"}`.
-- `matches` — `kickoff_at`, `home_score`, `away_score`, `status`, `stage`.
-- `loadRanking()` em `src/lib/scoring/ranking.ts` — array agregado já ordenado.
+- `matches` — `kickoff_at`, `home_score`, `away_score`, `status`, `stage`. **`status` é nullable e admite apenas `"postponed" | "cancelled"`**; "finalizado" é derivado (não há valor `'finished'`): um match está finalizado quando `home_score` e `away_score` são não-nulos E `status` é null/`'rescheduled'` (i.e., não foi cancelado/adiado).
+- `loadRanking()` em `src/lib/scoring/ranking.ts` — retorna `RankingRow[]` já ordenado e com **`row.rank`** (com tratamento de empate via `assignRanks`) e **`row.total_points`**. Inclui **todos os profiles** (mesmo zerados), portanto sempre encontrará o usuário autenticado.
 - `POINTS_TABLE` em `src/lib/scoring/points-table.ts` — pontos máximos (`exact`) por stage.
 - `getInicioDayMatches()` em `_lib/queries.ts` — matches do dia em SP (com fallback para próximo dia com jogos).
 
@@ -66,11 +66,9 @@ type AvisosData = {
   paid: boolean;
   nextUnpredictedMatch: {
     id: string;
-    homeLabel: string;
-    awayLabel: string;
     homeCode: string;
     awayCode: string;
-    kickoffAt: string; // ISO
+    kickoffAt: string; // ISO 8601
   } | null;
   pendingPredictionsCount: number;
   awaitingResultsCount: number;
@@ -79,35 +77,43 @@ type AvisosData = {
 };
 ```
 
-Implementação como `Promise.all` de queries paralelas:
+Implementação: `Promise.all` com 6 queries independentes resolvidas em paralelo (sem combinar — manter cada uma legível).
 
 1. **`paid`** — `select paid from profiles where id = userId`.
-2. **`nextUnpredictedMatch`** — `select id, home_team(...), away_team(...), kickoff_at from matches left join predictions on (predictions.match_id = matches.id and predictions.user_id = userId) where kickoff_at > now and kickoff_at <= now + 24h and predictions.id is null order by kickoff_at asc limit 1`.
-   Implementação prática (Supabase): buscar matches com `kickoff_at` no range, embutir `predictions!left(id)` filtrado por `predictions.user_id = userId`, e filtrar no JS por `prediction === null`. Pegar o primeiro.
-3. **`pendingPredictionsCount`** — chamar `getInicioDayMatches(supabase, userId, now)` (já existe), contar `matches.filter(m => m.prediction === null).length`. Reuso evita duplicar lógica de "dia em SP / próximo dia com jogos".
+2. **`nextUnpredictedMatch`** — buscar o próximo match nas próximas 24h em que o user não palpitou.
+   - Range: `kickoff_at > now AND kickoff_at <= now + 24h`.
+   - Supabase: `from("matches").select("id, home_team(...), away_team(...), kickoff_at, predictions!left(id)").eq("predictions.user_id", userId).gt("kickoff_at", now).lte("kickoff_at", now+24h).order("kickoff_at", asc).limit(N)`.
+   - No JS: filtrar `prediction === null`, pegar o primeiro. (`limit(N)` com folga porque o filtro JS pode descartar matches onde o user já palpitou.)
+3. **`pendingPredictionsCount`** — chamar `getInicioDayMatches(supabase, userId, now)`. Função retorna `DayMatchesResult = { matches, referenceDate, isToday }`; usar `result.matches.filter(m => m.prediction === null).length`. Reuso evita duplicar lógica de "dia em SP / próximo dia com jogos".
 4. **`awaitingResultsCount`** — predictions do user em matches já iniciados (`kickoff_at <= now`) que ainda não têm `prediction_scores` materializado.
-   Query: `select count(*) from predictions p join matches m on m.id = p.match_id left join prediction_scores ps on ps.prediction_id = p.id where p.user_id = userId and m.kickoff_at <= now and ps.id is null`.
-5. **`pointsEarned`** — `select coalesce(sum(points),0) from prediction_scores where user_id = userId`.
-6. **`pointsPossible`** — `select stage, count(*) from matches where home_score is not null and away_score is not null and status = 'finished' group by stage`. Multiplicar cada stage por `POINTS_TABLE[stage].exact` e somar. Cálculo no JS, não em SQL.
+   - SQL conceitual: `select count(*) from predictions p join matches m on m.id = p.match_id left join prediction_scores ps on ps.prediction_id = p.id where p.user_id = userId and m.kickoff_at <= now and ps.id is null`.
+   - Supabase: `from("predictions").select("id, prediction_scores!left(id), matches!inner(kickoff_at)", { count:"exact", head:true }).eq("user_id", userId).is("prediction_scores.id", null).lte("matches.kickoff_at", now)`.
+5. **`pointsEarned`** — `select coalesce(sum(points),0) from prediction_scores where user_id = userId`. Sem RPC: buscar `select points` filtrado e somar no JS.
+6. **`pointsPossible`** — soma de `POINTS_TABLE[stage].exact` para todos os matches **finalizados**.
+   - Predicado de finalizado: `home_score IS NOT NULL AND away_score IS NOT NULL AND (status IS NULL OR status NOT IN ('postponed','cancelled'))`.
+   - Supabase: `from("matches").select("stage, status, home_score, away_score")`, filtrar no JS pelo predicado acima, depois `groupBy(stage)` e somar `count(stage) * POINTS_TABLE[stage].exact`.
+   - Helper isolado: `computePointsPossible(matches: { stage: Stage }[]): number` em `_lib/avisos-queries.ts` — usado pelos testes unitários.
 
-> **Nota:** queries 5 e 6 podem ser combinadas em duas chamadas independentes; YAGNI dispensa otimização agora.
-
-## `loadSuaPosicaoData(supabase, userId)`
+## `loadSuaPosicaoData(userId)`
 
 Retorna:
 
 ```ts
 type SuaPosicaoData = {
-  rank: number | null;            // null se user não está no ranking (zero pts)
-  totalPlayers: number;
+  rank: number;                    // sempre presente (loadRanking inclui todos profiles)
+  totalPlayers: number;            // total de profiles no ranking agregado
+  totalPoints: number;
   exactCount: number;
-  totalPoints: number;             // útil pra exibir abaixo do "#12"
 };
 ```
 
-1. `loadRanking()` retorna `RankingRow[]` ordenado. Encontrar `row.user_id === userId`. Se encontrado, `rank = index + 1, totalPoints = row.total`. Se não, `rank = null`.
-2. `totalPlayers = ranking.length` (apenas quem aparece no aggregate; alinhar com `/classificacao`).
-3. `exactCount` = `select count(*) from prediction_scores where user_id = userId and tier = 'exact'`.
+1. `loadRanking()` (server-only, cria seu próprio Supabase client) retorna `RankingRow[]` já com `rank` e `total_points` calculados (`assignRanks` no `ranking-core.ts` trata empates). Achar `row.user_id === userId`; usar `row.rank` e `row.total_points` direto. **Não recalcular como `index + 1`** — quebraria empates.
+2. `totalPlayers = ranking.length`. (Como `aggregate()` inclui todos os profiles, isso equivale ao total de participantes do bolão.)
+3. `exactCount`: query separada — `select count(*) from prediction_scores where user_id = userId and tier = 'exact'`.
+
+Empty state visual: como o usuário sempre está no ranking, o trigger é `totalPoints === 0` (não `rank === null`) — ainda não palpitou ou nenhum palpite foi pontuado.
+
+> **Nota:** `loadRanking()` cria seu próprio Supabase client; este helper não recebe `supabase` como parâmetro para evitar confusão. Aceita-se a sobreposição de clients (já é o padrão do projeto em `/classificacao`).
 
 ## `AvisosCard` (server)
 
@@ -151,14 +157,17 @@ export async function AvisosCard() {
 ### `PaymentWarning`
 - Ícone: `AlertCircle` (lucide), cor warning.
 - Texto: "Pagamento pendente · sua inscrição precisa ser confirmada".
-- Link discreto: "Como pagar?" → `/regulamento#pagamento` (anchor a ser adicionado ao regulamento se ainda não existir; se não, link vai pra `/regulamento` sem fragment).
+- Link discreto: "Como pagar?" → `/regulamento`. (Não inventar anchor; deixar a navegação em `/regulamento` natural.)
+- A11y: container com `role="alert"` (não `role="status"` — é um warning persistente, não um update de estado).
 
 ### `NextMatchCountdown` (client)
 - Recebe `match: { homeCode, awayCode, kickoffAt }` (string ISO).
-- `useEffect` + `setInterval(1000)` calculando `kickoffAt - Date.now()`.
-- Renderiza inicial no SSR com `formatDuration(kickoffAt - Date.now())` (server time); ao montar no client, o intervalo recalcula. Pequena divergência aceitável.
-- Formato: `02:43:17` quando >1h; `43:17` quando <1h. Quando `<= 0` (jogo começou): aviso some na próxima query (não precisa lidar especificamente além de não negativo).
-- Texto auxiliar: `BRA × ARG · você ainda não palpitou`.
+- Estratégia de hidratação: renderiza placeholder estático (`--:--:--`) no SSR; após `useEffect` no mount, computa `kickoffAt - Date.now()` e inicia `setInterval(1000)`. Evita warning de hydration mismatch sem `suppressHydrationWarning`.
+- `formatCountdown(ms: number): string` — helper isolado em `_lib/avisos-queries.ts` (ou arquivo próprio se preferir):
+  - `>= 1h` → `HH:MM:SS` (ex: `02:43:17`)
+  - `< 1h` e `>= 0` → `MM:SS` (ex: `43:17`)
+  - `< 0` (jogo já começou) → retorna `"00:00"` e o componente sai na próxima query natural; não precisa redirecionar.
+- Texto auxiliar: `{homeCode} × {awayCode} · você ainda não palpitou` (códigos curtos, ex: `BRA × ARG`). Quando o slot ainda for TBD (knockout sem time definido), `nextUnpredictedMatch` provavelmente nem será retornado, pois o palpite está atrelado a um match cujo confronto ainda não está fechado — janela de 24h normalmente cobre só fase de grupos/oitavas com ambos os times definidos. Se cair um TBD aqui, mostrar `"TBD × TBD"` é aceitável (edge case raro).
 
 ### `PendingPredictions`
 - Texto: `{count} palpite{s} pendente{s} para os próximos jogos`.
@@ -183,16 +192,17 @@ export async function SuaPosicaoCard() {
   const { data: userData } = await supabase.auth.getUser();
   if (!userData.user) redirect("/");
 
-  const { rank, totalPlayers, exactCount } = await loadSuaPosicaoData(supabase, userData.user.id);
+  const { rank, totalPlayers, totalPoints, exactCount } = await loadSuaPosicaoData(userData.user.id);
+  const hasPalpitado = totalPoints > 0;
 
   return (
     <Card>
       <CardHeader><CardTitle>...Sua posição...</CardTitle></CardHeader>
       <CardContent>
         <span className="font-heading text-6xl text-primary tabular leading-none">
-          {rank !== null ? `#${rank}` : "#—"}
+          {hasPalpitado ? `#${rank}` : "#—"}
         </span>
-        {rank !== null ? (
+        {hasPalpitado ? (
           <span className="text-sm text-muted-foreground">
             de {totalPlayers} · {exactCount} cravado{exactCount === 1 ? "" : "s"}
           </span>
@@ -223,16 +233,16 @@ Mesmo Trophy icon e estilos do mock atual.
 ## Acessibilidade
 
 - Cada aviso tem ícone com `aria-hidden` e texto significativo.
-- `PaymentWarning` usa `role="status"`.
+- `PaymentWarning` usa `role="alert"`.
 - Countdown: o número absoluto deve estar no DOM (não só visualmente animado), com `aria-live="polite"` para anunciar mudança grosseira (sem ler 1s a 1s — usar atualização sob demanda do leitor).
 - Cores não são o único indicador (sempre há ícone + texto).
 
 ## Testes
 
-- Unit do helper de pontos possíveis: dado `[{stage:"group",count:3},{stage:"final",count:1}]` e `POINTS_TABLE`, somar correto.
-- Unit de `formatCountdown(ms)`: cobre `>1h`, `<1h`, `<1min`, `<= 0`.
-- Componente `NextMatchCountdown`: renderiza valor inicial; após `vi.advanceTimersByTime(1000)`, o tempo decresce.
-- Componente `PointsProgress`: renderiza `0%` para `earned=0/possible=10`, `100%` para `earned=10/possible=10`.
+- Unit de `computePointsPossible(matches)` em `_lib/avisos-queries.ts`: dado mistura de stages (ex: 3 group + 1 final) e o `POINTS_TABLE` real, somar `3 * POINTS_TABLE.group.exact + 1 * POINTS_TABLE.final.exact`.
+- Unit de `formatCountdown(ms)`: cobre `>= 1h` → `HH:MM:SS`; `< 1h` → `MM:SS`; `< 0` → `"00:00"`.
+- Componente `NextMatchCountdown`: SSR mostra `--:--:--`; após mount + `vi.advanceTimersByTime(1000)`, exibe valor formatado e decresce em ticks subsequentes.
+- Componente `PointsProgress`: renderiza `0%` para `earned=0/possible=10`, `100%` para `earned=10/possible=10`. Quando `possible === 0`, NÃO renderiza (retorna `null`).
 
 ## Fora de escopo
 
