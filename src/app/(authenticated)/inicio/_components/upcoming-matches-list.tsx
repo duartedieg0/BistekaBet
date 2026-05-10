@@ -1,4 +1,5 @@
 import { CalendarOff } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { MatchPredictionCard } from "@/app/(authenticated)/palpites/_components/match-prediction-card";
 import type { MatchWithPrediction } from "@/lib/types/prediction";
 
@@ -18,13 +19,27 @@ export function UpcomingMatchesList({
     );
   }
 
+  const now = Date.now();
+  const openCount = matches.filter(
+    (m) => new Date(m.kickoff_at).getTime() > now,
+  ).length;
+
   return (
     <div className="flex flex-col gap-3">
-      {dayLabel ? (
-        <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-          {dayLabel}
-        </p>
-      ) : null}
+      {(dayLabel || openCount > 0) && (
+        <div className="flex items-center justify-between gap-2">
+          {dayLabel ? (
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+              {dayLabel}
+            </p>
+          ) : <span />}
+          {openCount > 0 ? (
+            <Badge variant="secondary">
+              {openCount} aberto{openCount === 1 ? "" : "s"}
+            </Badge>
+          ) : null}
+        </div>
+      )}
       <div className="grid gap-3">
         {matches.map((m) => (
           <MatchPredictionCard key={m.id} match={m} />
