@@ -21,7 +21,7 @@ const NAV = [
   { href: "/inicio", label: "Início" },
   { href: "/palpites", label: "Palpites" },
   { href: "/classificacao", label: "Ranking" },
-  { href: "/inicio#regras", label: "Regras" },
+  { href: "/regulamento", label: "Regulamento" },
 ];
 
 export function AuthHeader({ profile }: { profile: Profile }) {

@@ -6,7 +6,7 @@ const ITEMS = [
   { href: "/inicio", label: "Início", icon: Home },
   { href: "/inicio#bets", label: "Minhas apostas", icon: CalendarDays },
   { href: "/classificacao", label: "Ranking", icon: Trophy },
-  { href: "/inicio#regras", label: "Regras", icon: ScrollText },
+  { href: "/regulamento", label: "Regulamento", icon: ScrollText },
 ];
 
 interface Props {
