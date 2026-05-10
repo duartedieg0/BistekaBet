@@ -9,9 +9,6 @@ export function PendingPredictions({ count }: { count: number }) {
         <span className="font-medium">
           {count} palpite{count === 1 ? "" : "s"} pendente{count === 1 ? "" : "s"} para os próximos jogos
         </span>
-        <Link href="/palpites" className="text-muted-foreground underline underline-offset-2 hover:text-foreground">
-          Palpitar agora
-        </Link>
       </div>
     </div>
   );

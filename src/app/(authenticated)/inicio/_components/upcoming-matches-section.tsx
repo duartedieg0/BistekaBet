@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/server";
 import { formatSaoPauloDayLabel } from "@/lib/dates/sao-paulo-day";
 import { getInicioDayMatches } from "../_lib/queries";
-import { InicioMatchesTabs } from "./inicio-matches-tabs";
+import { UpcomingMatchesList } from "./upcoming-matches-list";
 
 export async function UpcomingMatchesSection() {
   const supabase = await createClient();
@@ -25,11 +25,11 @@ export async function UpcomingMatchesSection() {
       <CardHeader>
         <CardTitle className="inline-flex items-center gap-2 font-heading text-xl tracking-wide">
           <CalendarDays className="size-5 text-primary" />
-          Seus próximos jogos
+          Próximos jogos
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <InicioMatchesTabs matches={matches} dayLabel={dayLabel} />
+        <UpcomingMatchesList matches={matches} dayLabel={dayLabel} />
       </CardContent>
     </Card>
   );
