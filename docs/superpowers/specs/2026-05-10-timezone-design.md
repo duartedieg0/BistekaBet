@@ -20,8 +20,8 @@ Brainstorm de origem: `brainstorm-timezone.md`.
 1. **BRT é o fuso oficial, hardcoded.** Sem suporte a per-user TZ. Se mudar de ideia, parametrizar é trivial depois.
 2. **Sem dependência nova.** Usar `Intl.DateTimeFormat` + aritmética manual (offset BRT = -03 fixo). Estende o padrão já em `src/lib/dates/sao-paulo-day.ts`.
 3. **Sem mudança visual.** UI dos cards continua mostrando `"15/06 16:00"` sem sufixo "(Brasília)". A correção é interna: o horário deixa de depender do fuso do dispositivo.
-4. **Client mantém `Date.now()` para `isClosed`.** RLS protege a gravação, toast amigável já existe (`"Esse jogo já começou."`). Edge case de relógio dessincronizado não justifica fetch extra por page load.
-5. **Server action passa a usar `now()` do Postgres** em vez de `Date.now()` do Node. Elimina dependência do clock do runtime Vercel e alinha com a RLS.
+4. **Client mantém `Date.now()` para `isClosed`.** RLS protege a gravação, toast amigável já existe (`"Esse jogo já começou."`). Edge case de relógio dessincronizado não justifica fetch extra por page load. Comparação de instantes (`new Date(iso).getTime() <= Date.now()`) é TZ-agnóstica — só formatação depende de TZ.
+5. **Server action passa a usar `now()` do Postgres** em vez de `Date.now()` do Node. Elimina dependência do clock do runtime Vercel e alinha com a RLS. Trade-off aceito: se a chamada `rpc("server_now")` falhar (PostgREST inacessível brevemente), a save action falha mesmo para jogos distantes do kickoff. Fallback explícito: em caso de erro do `rpc`, a action retorna erro e o usuário tenta de novo. Não há fallback para `Date.now()` para evitar reintroduzir o skew.
 
 ## Arquitetura
 
@@ -46,8 +46,12 @@ toSaoPauloInputValue(iso: string): string
 // Ex.: "2026-06-15T16:00". Para <input type="datetime-local">.
 
 fromSaoPauloInputValue(value: string): string
-// Recebe "2026-06-15T16:00" (naive, assumido BRT). Retorna ISO UTC.
-// Implementação: parse + new Date(Date.UTC(y, m-1, d, h+3, min)).toISOString().
+// Recebe "2026-06-15T16:00" ou "2026-06-15T16:00:00" (naive, assumido BRT).
+// Retorna ISO UTC. Aceita segundos opcionais (alguns browsers emitem :ss
+// no <input type="datetime-local">). Ms ignorados/zerados.
+// Implementação: parse com regex /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/
+// + new Date(Date.UTC(y, m-1, d, h+3, min, sec ?? 0)).toISOString().
+// Validação: lança Error se formato inválido (chamador converte em erro Zod).
 ```
 
 Tudo `Intl` + aritmética. Sem dependência nova.
@@ -71,11 +75,13 @@ Exposta via PostgREST. Usada pela server action.
 ### Admin (correção do bug de gravação)
 
 - `src/app/(authenticated)/admin/partidas/_components/match-form.tsx`
-  - Substituir `toLocalInput()` por `toSaoPauloInputValue(iso)`. Input passa a mostrar sempre BRT, independente de onde o admin acessa.
+  - Linha 11-15: substituir `toLocalInput()` por `toSaoPauloInputValue(iso)`. Input passa a mostrar sempre BRT, independente de onde o admin acessa.
+  - Linha 36-40: trocar `new Date(match.original_kickoff_at).toLocaleString("pt-BR")` por `formatKickoff(match.original_kickoff_at)` no display "Kickoff original".
 - `src/app/(authenticated)/admin/partidas/_actions.ts`
-  - Antes do Zod/Supabase, converter `kickoff_at` (string naive `YYYY-MM-DDTHH:mm`) com `fromSaoPauloInputValue`.
-  - Mesma conversão em `original_kickoff_at` quando presente.
-  - Schema Zod: aceita `YYYY-MM-DDTHH:mm` e transforma com `fromSaoPauloInputValue`.
+  - Antes do `safeParse`, converter `kickoff_at` (string naive vinda do `<input type="datetime-local">`) com `fromSaoPauloInputValue`. Manter conversão **fora do Zod** (evita acoplar validação ao helper de runtime e mantém mensagens de erro Zod legíveis). Tratar `Error` de parse e retornar `{ ok: false, error: "Formato de data inválido." }`.
+  - Não há campo `original_kickoff_at` no formulário hoje; nada a fazer no action para esse campo. (Se no futuro for adicionado, aplicar a mesma conversão.)
+- `src/lib/validation/match.ts`
+  - `kickoff_at: z.string().min(1)` (linha 13) **permanece como está** — agora ele recebe ISO UTC já convertido pelo action, não a string do `datetime-local`. Adicionar comentário curto explicando essa expectativa.
 - `src/app/(authenticated)/admin/partidas/_components/match-list.tsx`
   - Trocar `toLocaleString("pt-BR")` (linha ~55) por `formatKickoff(iso)`.
 
@@ -86,12 +92,16 @@ Exposta via PostgREST. Usada pela server action.
   - Linha 20 (`isClosed`): mantém `new Date(...).getTime() <= Date.now()`. `kickoff_at` é instante UTC; comparação é correta sem TZ.
 - `src/app/(authenticated)/palpites/_components/rescheduled-badge.tsx`
   - `formatKickoff(originalKickoff)`.
+- `src/lib/match-status.ts` (linha 6)
+  - `deriveMatchStatus` usa `new Date(match.kickoff_at).getTime() > Date.now()` para decidir `scheduled` vs `live`. Comparação de instantes — TZ-agnóstica. **Sem mudança.**
+- `src/app/(authenticated)/inicio/_components/upcoming-matches-list.tsx` (linhas 22-24)
+  - Filtro `Date.now()` para contar jogos abertos. Server component (Vercel/UTC); `Date.now()` retorna instante UTC, comparação contra `kickoff_at` é correta. **Sem mudança.**
 
 ### Server action (validação de bloqueio)
 
 - `src/app/(authenticated)/palpites/_actions.ts` — `validateAgainstMatches`
-  - Substituir `const now = Date.now()` por chamada `supabase.rpc("server_now")` e usar o valor retornado.
-  - Se `rpc` falhar, retornar erro propagado (não fazer fallback silencioso pra `Date.now()` — a RLS pega no pior caso).
+  - Substituir `const now = Date.now()` (linha 32) por chamada `supabase.rpc("server_now")` e usar o valor retornado.
+  - Se `rpc` falhar, retornar `{ ok: false, errors: [{ matchId: "*", error: "Não foi possível validar o horário do jogo. Tente de novo." }] }`. Sem fallback para `Date.now()` (reintroduziria o skew). Trade-off aceito (ver Decisão 5).
 
 ## Testes
 
@@ -100,7 +110,9 @@ Exposta via PostgREST. Usada pela server action.
 - `formatKickoff("2026-06-15T19:00:00Z")` → `"15/06 16:00"`.
 - `toSaoPauloInputValue("2026-06-15T19:00:00Z")` → `"2026-06-15T16:00"`.
 - `fromSaoPauloInputValue("2026-06-15T16:00")` → `"2026-06-15T19:00:00.000Z"`.
-- Round-trip: `fromSaoPauloInputValue(toSaoPauloInputValue(iso)) === iso` em vários horários.
+- `fromSaoPauloInputValue("2026-06-15T16:00:00")` (com segundos) → `"2026-06-15T19:00:00.000Z"`.
+- `fromSaoPauloInputValue("formato-invalido")` → lança `Error`.
+- Round-trip apenas em minuto-boundary: `fromSaoPauloInputValue(toSaoPauloInputValue(iso)) === iso` para `iso` cujo BRT tem `:00` em segundos/ms.
 - Borda: `fromSaoPauloInputValue("2026-06-15T00:30")` → `"2026-06-15T03:30:00.000Z"` (mantém o dia).
 - Borda: virada de dia BRT (23:00 BRT = 02:00 UTC do dia seguinte).
 
