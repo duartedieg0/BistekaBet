@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { Profile } from "@/types/profile";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthHeader } from "./_components/auth-header";
+import { WhatsappRequiredModal } from "./_components/whatsapp-required-modal";
 
 export default async function AuthenticatedLayout({
   children,
@@ -18,7 +19,7 @@ export default async function AuthenticatedLayout({
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("id, role, display_name, avatar_url, created_at, updated_at")
+    .select("id, role, display_name, avatar_url, whatsapp, created_at, updated_at")
     .eq("id", user.id)
     .single<Profile>();
 
@@ -29,6 +30,7 @@ export default async function AuthenticatedLayout({
       <AuthHeader profile={profile} />
       <div className="flex-1">{children}</div>
       <Toaster richColors position="top-right" />
+      {profile.whatsapp === null && <WhatsappRequiredModal />}
     </div>
   );
 }
