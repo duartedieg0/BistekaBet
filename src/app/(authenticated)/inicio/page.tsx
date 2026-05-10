@@ -1,9 +1,8 @@
-import { Flame, Trophy } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { RankingPreview } from "./_components/ranking-preview";
 import { UpcomingMatchesSection } from "./_components/upcoming-matches-section";
+import { SuaPosicaoCard } from "./_components/sua-posicao-card";
+import { AvisosCard } from "./_components/avisos-card";
 
 export default function InicioPage() {
   return (
@@ -29,35 +28,8 @@ export default function InicioPage() {
         <UpcomingMatchesSection />
 
         <div className="flex flex-col gap-5">
-          <Card>
-            <CardHeader>
-              <CardTitle className="inline-flex items-center gap-2 font-heading text-xl tracking-wide">
-                <Trophy className="size-5 text-primary" />
-                Sua posição
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="flex flex-col items-start gap-3">
-              <span className="font-heading text-6xl text-primary tabular leading-none">
-                #—
-              </span>
-              <span className="text-sm text-muted-foreground">
-                Você ainda não palpitou. Comece pela primeira partida para
-                entrar no ranking.
-              </span>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="inline-flex items-center gap-2 font-heading text-xl tracking-wide">
-                <Flame className="size-5 text-primary" />
-                Aposta da rodada
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Skeleton className="h-24 w-full rounded-lg" />
-            </CardContent>
-          </Card>
+          <SuaPosicaoCard />
+          <AvisosCard />
         </div>
       </section>
 
