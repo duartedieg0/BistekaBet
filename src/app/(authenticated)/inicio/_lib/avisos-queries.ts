@@ -83,11 +83,9 @@ export async function loadAvisosData(
   const awaitingP = supabase
     .from("predictions")
     .select(
-      "id, prediction_scores!left(id), matches!inner(kickoff_at)",
-      { count: "exact", head: true },
+      "id, prediction_scores!left(prediction_id), matches!inner(kickoff_at)",
     )
     .eq("user_id", userId)
-    .is("prediction_scores.id", null)
     .lte("matches.kickoff_at", nowIso);
 
   const earnedP = supabase
@@ -128,7 +126,13 @@ export async function loadAvisosData(
     (m) => m.prediction === null,
   ).length;
 
-  const awaitingResultsCount = awaitingR.count ?? 0;
+  const awaitingRows = (awaitingR.data ?? []) as unknown as {
+    id: string;
+    prediction_scores: { prediction_id: string }[] | null;
+  }[];
+  const awaitingResultsCount = awaitingRows.filter(
+    (r) => !r.prediction_scores || r.prediction_scores.length === 0,
+  ).length;
 
   const earnedRows = (earnedR.data ?? []) as { points: number }[];
   const pointsEarned = earnedRows.reduce((acc, r) => acc + (r.points ?? 0), 0);
