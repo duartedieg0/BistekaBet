@@ -7,12 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { Match, Team } from "@/lib/types/match";
 import { updateMatch } from "../_actions";
-
-function toLocalInput(iso: string): string {
-  const d = new Date(iso);
-  const pad = (n: number) => n.toString().padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
+import { toSaoPauloInputValue, formatKickoff } from "@/lib/dates/sao-paulo-day";
 
 export function MatchForm({ match, teams }: { match: Match; teams: Team[] }) {
   const isKnockout = match.stage !== "group";
@@ -30,12 +25,12 @@ export function MatchForm({ match, teams }: { match: Match; teams: Team[] }) {
             id="kickoff_at"
             name="kickoff_at"
             type="datetime-local"
-            defaultValue={toLocalInput(match.kickoff_at)}
+            defaultValue={toSaoPauloInputValue(match.kickoff_at)}
             required
           />
           {match.original_kickoff_at && (
             <p className="text-xs text-muted-foreground mt-1">
-              Kickoff original: {new Date(match.original_kickoff_at).toLocaleString("pt-BR")}
+              Kickoff original: {formatKickoff(match.original_kickoff_at)}
             </p>
           )}
         </div>
