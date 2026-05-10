@@ -15,39 +15,51 @@ type Slot = {
 
 const slots: Slot[] = [
   {
+    id: "total",
+    tier: "Pacote Total",
+    title: "Dono da resenha Bisteka Bet",
+    description:
+      "A marca que entra em campo com a Patota Bisteka do início ao fim.",
+    perks: [
+      "Logo no topo da home + dashboard ao vivo",
+      "Menção em cada notificação de rodada",
+      "Logo nas telas de mata-mata",
+      "Logo na tela de Classificação",
+      "Logo no rodapé",
+      "Menção no regulamento oficial",
+    ],
+  },
+  {
     id: "patrono",
-    tier: "Cota Patrono",
+    tier: "Pacote Patrono",
     title: "Sua marca no topo do ranking",
     description:
-      "Logo em destaque na home, no scoreboard ao vivo e no e-mail de cada rodada. Sua marca acompanha cada apito final.",
+      "Logo em destaque na home, no Resultado ao Vivo e no Grupo de Whatsapp com os resultados da rodada.",
     perks: [
-      "Logo no topo da home + dashboard",
+      "Logo no topo da home + dashboard ao vivo",
       "Menção em cada notificação de rodada",
-      "Camisa da Seleção co-branded para o campeão",
     ],
   },
   {
     id: "oficial",
-    tier: "Cota Oficial",
+    tier: "Pacote Oficial",
     title: "Patrocinador da fase eliminatória",
     description:
       "Marca presente nas telas de oitavas, quartas, semis e final — quando o coração bate mais forte e ninguém desgruda do ranking.",
     perks: [
       "Logo nas telas de mata-mata",
-      "Spot no resumo semanal",
-      "Brinde exclusivo pro pódio",
+      "Logo na tela de Classificação",
     ],
   },
   {
     id: "apoio",
-    tier: "Cota Apoio",
+    tier: "Pacote Apoio",
     title: "Apoiador da Patota Bisteka",
     description:
-      "Marca no rodapé do bolão e no regulamento oficial. Boa pra empresa local que quer aparecer pro grupo da firma.",
+      "Marca no rodapé do bolão e no regulamento oficial.",
     perks: [
-      "Logo no rodapé do webapp",
+      "Logo no rodapé",
       "Menção no regulamento oficial",
-      "Post de agradecimento ao final da Copa",
     ],
   },
   {
@@ -58,8 +70,8 @@ const slots: Slot[] = [
       "Tem produto, serviço ou experiência pra oferecer pro pódio? A gente conversa em formato de permuta e dá o destaque que combina.",
     perks: [
       "Brinde para 1º, 2º ou 3º lugar",
-      "Espaço editorial no anúncio do pódio",
-      "Tag nas redes da organização",
+      "Espaço no anúncio do pódio",
+      "Tag nas divulgações",
     ],
   },
 ];
@@ -115,8 +127,7 @@ export function Sponsors() {
           </h2>
           <p className="mt-4 text-lg text-muted-foreground">
             A Copa de 2026 dura 39 dias e todo apito final tem gente vidrada no
-            ranking. Sua marca pode estar lá no meio. Ainda não temos
-            patrocinadores — esses espaços são seus.
+            ranking. Sua marca pode estar lá no meio.
           </p>
         </div>
 
@@ -133,7 +144,7 @@ export function Sponsors() {
           <ul
             ref={trackRef}
             className="flex snap-x snap-mandatory gap-5 overflow-x-auto pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-            aria-label="Cotas de patrocínio disponíveis"
+            aria-label="Pacotes de patrocínio disponíveis"
           >
             {slots.map((slot, i) => (
               <li
@@ -177,7 +188,7 @@ export function Sponsors() {
               type="button"
               onClick={prev}
               disabled={activeIndex === 0}
-              aria-label="Cota anterior"
+              aria-label="Pacote anterior"
               className="inline-flex size-10 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-foreground hover:text-background disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-card disabled:hover:text-foreground"
             >
               <ChevronLeft className="size-5" />
@@ -205,7 +216,7 @@ export function Sponsors() {
               type="button"
               onClick={next}
               disabled={activeIndex === slots.length - 1}
-              aria-label="Próxima cota"
+              aria-label="Próximo pacote"
               className="inline-flex size-10 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-foreground hover:text-background disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-card disabled:hover:text-foreground"
             >
               <ChevronRight className="size-5" />
@@ -215,7 +226,7 @@ export function Sponsors() {
 
         <div className="mx-auto mt-14 flex max-w-2xl flex-col items-center gap-4 rounded-xl border border-foreground/10 bg-card/80 p-6 text-center backdrop-blur-sm">
           <p className="text-sm text-muted-foreground">
-            Quer fechar uma cota ou montar um formato custom? Fala com a
+            Quer fechar um pacote ou montar um formato custom? Fala com a
             organização da Patota Bisteka.
           </p>
           <a
