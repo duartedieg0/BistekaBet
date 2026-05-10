@@ -222,13 +222,13 @@ Mesmo Trophy icon e estilos do mock atual.
 ## Render & SSR
 
 - Todos os componentes são server exceto `NextMatchCountdown`.
-- `NextMatchCountdown` recebe `kickoffAt: string` (ISO). Server-render mostra valor calculado uma vez; `useEffect` no client inicia `setInterval`. Não há hydration mismatch porque o valor inicial é determinístico (calculado a partir de `kickoffAt`, que é o mesmo no server e no client) e o intervalo só inicia após mount.
+- `NextMatchCountdown` recebe `kickoffAt: string` (ISO). SSR renderiza o placeholder estático `--:--:--`; após `useEffect` no mount, calcula o delta inicial e inicia `setInterval`. Sem warning de hydration porque o HTML do server é constante.
 - `loadAvisosData` e `loadSuaPosicaoData` são chamados em paralelo (cada card fetcha o seu) — duas chamadas independentes a `createClient()`. Aceitável; YAGNI quanto a consolidar.
 
 ## Performance
 
 - `loadRanking()` agrega scores em memória; já é o padrão usado em `/classificacao` e `RankingPreview`. Sem cache atual; aceito por enquanto.
-- `loadAvisosData` faz ~5 queries paralelas. Latência total ≈ max query, não soma.
+- `loadAvisosData` faz 6 queries paralelas. Latência total ≈ max query, não soma.
 
 ## Acessibilidade
 
