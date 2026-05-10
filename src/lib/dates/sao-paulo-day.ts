@@ -25,6 +25,20 @@ export function saoPauloDayRange(
   return { startUtc, endUtc };
 }
 
+export function formatKickoff(iso: string): string {
+  const date = new Date(iso);
+  const parts = new Intl.DateTimeFormat("pt-BR", {
+    timeZone: TZ,
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).formatToParts(date);
+  const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "";
+  return `${get("day")}/${get("month")} ${get("hour")}:${get("minute")}`;
+}
+
 export function formatSaoPauloDayLabel(
   date: Date,
   opts: { isToday?: boolean } = {},
