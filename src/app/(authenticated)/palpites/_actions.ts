@@ -27,9 +27,17 @@ async function validateAgainstMatches(
     .in("id", ids);
   if (error) return { ok: false, errors: [{ matchId: "*", error: error.message }] };
 
+  const { data: nowIso, error: nowErr } = await supabase.rpc("server_now");
+  const now = nowIso ? new Date(nowIso as string).getTime() : NaN;
+  if (nowErr || !Number.isFinite(now)) {
+    return {
+      ok: false,
+      errors: [{ matchId: "*", error: "Não foi possível validar o horário do jogo. Tente de novo." }],
+    };
+  }
+
   const byId = new Map(matches?.map((m) => [m.id, m]) ?? []);
   const errs: Array<{ matchId: string; error: string }> = [];
-  const now = Date.now();
 
   for (const input of inputs) {
     const m = byId.get(input.matchId);
