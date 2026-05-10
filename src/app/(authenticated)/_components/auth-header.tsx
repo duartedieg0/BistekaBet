@@ -116,7 +116,7 @@ export function AuthHeader({ profile }: { profile: Profile }) {
         aria-label="Navegação principal"
         className="md:hidden"
       >
-        <div className="mx-auto flex max-w-7xl items-center gap-1 overflow-x-auto px-4 py-2">
+        <div className="mx-auto flex max-w-7xl items-center justify-center gap-1 overflow-x-auto px-4 pb-2">
           {NAV.map((item) => (
             <Link
               key={item.href}
