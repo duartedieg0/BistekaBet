@@ -7,7 +7,7 @@ export function PendingPredictions({ count }: { count: number }) {
       <ListTodo className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
       <div className="flex flex-col gap-1 text-sm">
         <span className="font-medium">
-          {count} palpite{count === 1 ? "" : "s"} pendente{count === 1 ? "" : "s"}
+          {count} palpite{count === 1 ? "" : "s"} pendente{count === 1 ? "" : "s"} para os próximos jogos
         </span>
         <Link href="/palpites" className="text-muted-foreground underline underline-offset-2 hover:text-foreground">
           Palpitar agora
