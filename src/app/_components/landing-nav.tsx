@@ -4,7 +4,7 @@ import { GoogleSignInButton } from "@/app/_components/google-sign-in-button";
 export function LandingNav() {
   return (
     <header className="sticky top-0 z-40 border-b border-white/10 bg-[oklch(0.14_0.01_30)]/80 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 text-white">
+      <div className="relative mx-auto flex h-16 max-w-7xl items-center justify-between px-6 text-white">
         <a href="/" className="inline-flex items-center gap-2.5">
           <span className="flex size-9 items-center justify-center overflow-hidden rounded-md bg-white/5 ring-1 ring-white/10">
             <Image
@@ -21,7 +21,7 @@ export function LandingNav() {
           </span>
         </a>
 
-        <nav className="hidden items-center gap-8 text-sm text-white/70 md:flex">
+        <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-8 text-sm text-white/70 md:flex">
           <a className="transition-colors hover:text-white" href="/#como-funciona">
             Como funciona
           </a>
