@@ -29,6 +29,7 @@ export type MatchStatus = ExplicitMatchStatus | DerivedMatchStatus;
 
 export interface Team {
   id: string;
+  api_football_id: number | null;
   code: string;
   name: string;
   flag_url: string | null;
@@ -39,6 +40,7 @@ export interface Team {
 
 export interface Match {
   id: string;
+  api_football_id: number | null;
   stage: Stage;
   group_code: GroupCode | null;
   bracket_position: number | null;
