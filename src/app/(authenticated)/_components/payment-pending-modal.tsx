@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, XIcon } from "lucide-react";
 import {
   Dialog,
   DialogClose,
@@ -28,7 +28,39 @@ export function PaymentPendingModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[calc(100%-2rem)] gap-5 p-6 pb-[max(env(safe-area-inset-bottom),1.5rem)] sm:max-w-md [&_[data-slot=dialog-close]]:hidden sm:[&_[data-slot=dialog-close]]:inline-flex">
+      <DialogContent
+        showCloseButton={false}
+        className="max-w-[calc(100%-2rem)] gap-5 p-6 pb-[max(env(safe-area-inset-bottom),1.5rem)] sm:max-w-md"
+      >
+        <DialogClose
+          render={
+            <button
+              type="button"
+              aria-label="Fechar"
+              className={cn(
+                buttonVariants({ variant: "ghost", size: "sm" }),
+                "absolute top-2 right-2 sm:hidden",
+              )}
+            />
+          }
+        >
+          Fechar
+        </DialogClose>
+        <DialogClose
+          render={
+            <button
+              type="button"
+              aria-label="Fechar"
+              className={cn(
+                buttonVariants({ variant: "ghost", size: "icon-sm" }),
+                "absolute top-2 right-2 hidden sm:inline-flex",
+              )}
+            />
+          }
+        >
+          <XIcon />
+        </DialogClose>
+
         <div className="flex flex-col items-center gap-3">
           <span className="flex size-14 items-center justify-center overflow-hidden rounded-xl bg-secondary ring-1 ring-border sm:size-16">
             <Image
@@ -76,20 +108,6 @@ export function PaymentPendingModal({
           <MessageCircle className="size-5" />
           Já paguei, avisar no WhatsApp
         </a>
-
-        <DialogClose
-          render={
-            <button
-              type="button"
-              className={cn(
-                buttonVariants({ variant: "ghost", size: "lg" }),
-                "h-11 sm:hidden",
-              )}
-            />
-          }
-        >
-          Fechar
-        </DialogClose>
       </DialogContent>
     </Dialog>
   );
