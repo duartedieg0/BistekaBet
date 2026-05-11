@@ -1,4 +1,4 @@
-export const INSCRIPTION_VALUE_BRL = 75;
+export const INSCRIPTION_VALUE_BRL = 35;
 
 export const COMPETITION = {
   name: "Copa do Mundo 2026",
