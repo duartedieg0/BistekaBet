@@ -2,6 +2,7 @@ import { CalendarDays, TrendingUp, Users } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RecomputeScoresCard } from "./_components/recompute-scores-card";
+import { ImportResultsCard } from "./_components/import-results-card";
 
 export default function AdminPage() {
   return (
@@ -40,6 +41,7 @@ export default function AdminPage() {
           </CardContent>
         </Card>
         <RecomputeScoresCard />
+        <ImportResultsCard />
       </section>
     </>
   );
