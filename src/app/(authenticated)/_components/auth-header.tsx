@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { Profile } from "@/types/profile";
 import { getInitials } from "./avatar-fallback";
+import { PaymentPendingTrigger } from "./payment-pending-trigger";
 
 const NAV = [
   { href: "/inicio", label: "Início" },
@@ -78,6 +79,8 @@ export function AuthHeader({ profile }: { profile: Profile }) {
           method="post"
           className="hidden"
         />
+
+        {!profile.paid && <PaymentPendingTrigger />}
 
         <DropdownMenu>
           <DropdownMenuTrigger className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring">
