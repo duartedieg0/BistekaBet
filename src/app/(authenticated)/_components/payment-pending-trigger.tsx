@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { PaymentPendingModal } from "./payment-pending-modal";
 
 const SESSION_KEY = "bb:payment-modal-seen";
+export const OPEN_PAYMENT_MODAL_EVENT = "bb:open-payment-modal";
 
 export function PaymentPendingTrigger() {
   const [open, setOpen] = useState(false);
@@ -16,6 +17,12 @@ export function PaymentPendingTrigger() {
     sessionStorage.setItem(SESSION_KEY, "1");
     // eslint-disable-next-line react-hooks/set-state-in-effect -- one-shot auto-open após mount no cliente; sessionStorage não disponível em SSR
     setOpen(true);
+  }, []);
+
+  useEffect(() => {
+    const handler = () => setOpen(true);
+    window.addEventListener(OPEN_PAYMENT_MODAL_EVENT, handler);
+    return () => window.removeEventListener(OPEN_PAYMENT_MODAL_EVENT, handler);
   }, []);
 
   return (

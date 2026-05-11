@@ -1,5 +1,7 @@
-import Link from "next/link";
+"use client";
+
 import { AlertCircle } from "lucide-react";
+import { OPEN_PAYMENT_MODAL_EVENT } from "../../../_components/payment-pending-trigger";
 
 export function PaymentWarning() {
   return (
@@ -12,9 +14,15 @@ export function PaymentWarning() {
         <span className="font-medium">Pagamento pendente</span>
         <span className="text-muted-foreground">
           Sua inscrição precisa ser confirmada.{" "}
-          <Link href="/regulamento" className="underline underline-offset-2 hover:text-foreground">
+          <button
+            type="button"
+            onClick={() =>
+              window.dispatchEvent(new Event(OPEN_PAYMENT_MODAL_EVENT))
+            }
+            className="underline underline-offset-2 hover:text-foreground"
+          >
             Como pagar?
-          </Link>
+          </button>
         </span>
       </div>
     </div>
