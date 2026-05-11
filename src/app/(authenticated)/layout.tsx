@@ -19,7 +19,7 @@ export default async function AuthenticatedLayout({
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("id, role, display_name, avatar_url, whatsapp, created_at, updated_at")
+    .select("id, role, display_name, avatar_url, whatsapp, paid, created_at, updated_at")
     .eq("id", user.id)
     .single<Profile>();
 

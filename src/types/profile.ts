@@ -7,6 +7,7 @@ export type Profile = {
   display_name: string;
   avatar_url: string | null;
   whatsapp: string | null;
+  paid: boolean;
   created_at: string;
   updated_at: string;
 };
