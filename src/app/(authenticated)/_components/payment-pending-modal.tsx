@@ -27,7 +27,7 @@ export function PaymentPendingModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md gap-5 p-6 pb-[max(env(safe-area-inset-bottom),1.5rem)]">
+      <DialogContent className="max-w-[calc(100%-2rem)] gap-5 p-6 pb-[max(env(safe-area-inset-bottom),1.5rem)] sm:max-w-md">
         <div className="flex flex-col items-center gap-3">
           <span className="flex size-14 items-center justify-center overflow-hidden rounded-xl bg-secondary ring-1 ring-border sm:size-16">
             <Image
