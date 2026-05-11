@@ -1,5 +1,6 @@
 // src/lib/api-football/client.ts
-import "server-only";
+// Server-only por construcao: depende de process.env.API_FOOTBALL_KEY (sem NEXT_PUBLIC_),
+// entao nao roda no bundle do cliente. Sem `import "server-only"` para permitir uso em scripts (tsx).
 import { FixturesResponseSchema, TeamsResponseSchema } from "./schemas";
 import type { ApiFootballFixture, ApiFootballTeam } from "./types";
 
