@@ -182,7 +182,9 @@ export async function commitImport(entries: DiffEntry[]): Promise<CommitImportRe
 
     revalidatePath("/admin");
     revalidatePath("/admin/partidas");
-    revalidatePath("/leaderboard");
+    revalidatePath("/inicio");
+    revalidatePath("/classificacao");
+    revalidatePath("/palpites");
 
     return { ok: true, updated, unchanged: 0, errored };
   } catch (err) {
