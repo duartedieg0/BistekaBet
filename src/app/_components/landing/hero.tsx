@@ -32,9 +32,7 @@ export function Hero({ errorMessage }: { errorMessage?: string | null }) {
           </h1>
 
           <p className="max-w-xl text-lg text-white/70 sm:text-xl">
-            Palpite os {COMPETITION.totalMatches} jogos da Copa, suba no ranking
-            a cada apito final e dispute a camisa da Seleção Brasileira + bolada
-            em dinheiro pro pódio da Patota Bisteka.
+            A Patota Bistekas e Equipe Coringas te convida a participar do bolão da copa do mundo.
           </p>
 
           <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
@@ -140,6 +138,13 @@ function Mascot() {
         height={720}
         priority
         className="motion-safe:animate-float relative mx-auto h-auto w-[clamp(280px,42vw,520px)] drop-shadow-[0_30px_40px_oklch(0.14_0.01_30/0.6)]"
+      />
+      <Image
+        src="/logo_coringas.png"
+        alt="Logo Equipe Coringas — parceria"
+        width={707}
+        height={1000}
+        className="absolute bottom-0 right-0 h-auto w-[clamp(140px,21vw,260px)] drop-shadow-[0_20px_30px_oklch(0.14_0.01_30/0.6)]"
       />
     </div>
   );
