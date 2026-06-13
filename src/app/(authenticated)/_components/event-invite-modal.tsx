@@ -46,20 +46,20 @@ export function EventInviteModal({
         </DialogClose>
 
         <div className="flex flex-col items-center gap-3">
-          <div className="flex items-end justify-center gap-2">
+          <div className="relative mx-auto h-32 w-40">
             <Image
               src="/BISTECA.png"
               alt="Bisteka Bet"
               width={560}
               height={720}
-              className="h-24 w-auto object-contain"
+              className="relative mx-auto h-full w-auto object-contain"
             />
             <Image
               src="/logo_coringas.png"
               alt="Equipe Coringas"
               width={707}
               height={1000}
-              className="h-24 w-auto object-contain"
+              className="absolute bottom-0 right-0 h-20 w-auto object-contain"
             />
           </div>
           <DialogTitle className="text-center font-heading text-xl uppercase tracking-wide">
