@@ -3,8 +3,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RecomputeScoresCard } from "./_components/recompute-scores-card";
 import { ImportResultsCard } from "./_components/import-results-card";
+import { EventInviteToggleCard } from "./_components/event-invite-toggle-card";
+import { getAppSetting } from "@/lib/app-settings";
 
-export default function AdminPage() {
+export default async function AdminPage() {
+  const eventInviteEnabled = await getAppSetting<boolean>(
+    "event_invite_enabled",
+    false,
+  );
   return (
     <>
       <header className="flex flex-col gap-1 pb-8">
@@ -42,6 +48,7 @@ export default function AdminPage() {
         </Card>
         <RecomputeScoresCard />
         <ImportResultsCard />
+        <EventInviteToggleCard defaultEnabled={eventInviteEnabled} />
       </section>
     </>
   );
