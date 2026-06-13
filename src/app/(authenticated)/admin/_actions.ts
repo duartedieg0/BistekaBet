@@ -8,6 +8,7 @@ import { fetchFixtures } from "@/lib/api-football/client";
 import { mapFixtureToPatch } from "@/lib/api-football/mapper";
 import { buildDiffEntry, type DbMatchSlim } from "@/lib/api-football/diff";
 import type { DiffEntry } from "@/lib/api-football/types";
+import { setAppSetting } from "@/lib/app-settings";
 
 export async function recomputeAllScores(): Promise<{
   matchesProcessed: number;
@@ -190,5 +191,34 @@ export async function commitImport(entries: DiffEntry[]): Promise<CommitImportRe
   } catch (err) {
     console.error("commitImport failed", err);
     return { ok: false, error: err instanceof Error ? err.message : "unknown" };
+  }
+}
+
+export async function setEventInviteEnabled(
+  enabled: boolean,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return { ok: false, error: "unauthenticated" };
+
+    const { data: isAdmin, error: rpcError } = await supabase.rpc("is_admin", {
+      uid: user.id,
+    });
+    if (rpcError) return { ok: false, error: rpcError.message };
+    if (!isAdmin) return { ok: false, error: "forbidden" };
+
+    await setAppSetting<boolean>("event_invite_enabled", enabled);
+
+    revalidatePath("/");
+    revalidatePath("/admin");
+    return { ok: true };
+  } catch (err) {
+    return {
+      ok: false,
+      error: err instanceof Error ? err.message : "unknown",
+    };
   }
 }
