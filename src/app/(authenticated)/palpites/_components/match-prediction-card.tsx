@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState, useTransition } from "react";
+import Link from "next/link";
+import { Users } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -116,7 +118,19 @@ export function MatchPredictionCard({ match }: { match: MatchWithPrediction }) {
             <span className="text-xs font-medium tabular text-muted-foreground">{kickoffLabel}</span>
             <RescheduledBadge originalKickoff={match.original_kickoff_at} />
           </div>
-          {statusBadge}
+          <div className="flex items-center gap-2">
+            {statusBadge}
+            {isClosed ? (
+              <Link
+                href={`/partidas/${match.id}`}
+                aria-label={`Ver palpites de ${homeLabel} contra ${awayLabel}`}
+                className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground"
+              >
+                <Users className="size-3.5" aria-hidden />
+                Ver palpites
+              </Link>
+            ) : null}
+          </div>
         </CardHeader>
 
         <CardContent className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 pt-1">
