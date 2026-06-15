@@ -47,11 +47,20 @@ export function PredictionsList({ rows, showPoints }: Props) {
       ) : (
         <>
           {withPrediction.length > 0 ? (
-            <ul className="rounded-md border">
-              {withPrediction.map((row) => (
-                <PredictionRow key={row.user_id} row={row} showPoints={showPoints} />
-              ))}
-            </ul>
+            <div className="rounded-md border">
+              <div className="flex items-center gap-3 border-b bg-muted/50 px-2 py-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+                <span className="w-8 text-right">#</span>
+                <span className="size-7 shrink-0" aria-hidden />
+                <span className="min-w-0 flex-1">Participante</span>
+                <span className="w-16 text-right">Palpite</span>
+                {showPoints ? <span className="w-12 text-right">Pts</span> : null}
+              </div>
+              <ul>
+                {withPrediction.map((row) => (
+                  <PredictionRow key={row.user_id} row={row} showPoints={showPoints} />
+                ))}
+              </ul>
+            </div>
           ) : (
             <p className="py-10 text-center text-sm text-muted-foreground">
               Ninguém palpitou neste jogo.
