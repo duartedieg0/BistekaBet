@@ -19,9 +19,6 @@ export default function InicioPage() {
             Confira seus próximos jogos, dê palpite e acompanhe o ranking.
           </p>
         </div>
-        <Badge variant="upcoming" className="h-7 px-3 text-xs">
-          Pré-Copa
-        </Badge>
       </header>
 
       <section className="grid gap-5 lg:grid-cols-[2fr_1fr]">
