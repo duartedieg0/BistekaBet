@@ -181,7 +181,9 @@ passam a bater, ex.: 61 = 61).
 1. **`db-max-rows` < 1000 no projeto** — se o Supabase estiver configurado com
    teto menor, `pageSize = 1000` pediria mais do que o servidor devolve e o laço
    pararia cedo (página < 1000) achando que acabou. Mitigação: manter `pageSize`
-   ≤ teto efetivo. Default do Supabase é 1000; assumimos o default. Se necessário,
+   ≤ teto efetivo. Default do Supabase é 1000; assumimos o default — e o próprio
+   sintoma confirma: com 1122 linhas o app enxergou exatamente o equivalente a um
+   corte em 1000, evidência de que o teto efetivo é o default. Se necessário,
    reduzir `pageSize` (ex.: 500) é seguro e só muda o nº de round-trips.
 2. **Tráfego de rede** — traz todas as linhas a cada render (1122 hoje, alguns
    milhares na final). Trivial na escala de um bolão; aceito conscientemente.
