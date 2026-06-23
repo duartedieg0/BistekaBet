@@ -60,6 +60,21 @@ export function assignRanks(sorted: RankingEntry[]): RankingRow[] {
   return result;
 }
 
+export function applyScoreToEntry(
+  entry: RankingEntry,
+  input: { points: number; tier: Tier; stage: Stage },
+): void {
+  const { points, tier, stage } = input;
+  entry.total_points += points;
+  if (tier === "exact") {
+    entry.exacts_total += 1;
+    if (KNOCKOUT_STAGES.has(stage)) entry.exacts_knockout += 1;
+  }
+  if (tier !== "miss") entry.winner_or_draw_total += 1;
+  if (stage === "final") entry.final_points += points;
+  if (SEMI_THIRD_FINAL.has(stage)) entry.semi_third_final_points += points;
+}
+
 export function aggregate(
   profiles: ProfileRow[],
   scores: ScoreWithStageRow[],
@@ -83,15 +98,7 @@ export function aggregate(
   for (const sc of scores) {
     const entry = init.get(sc.user_id);
     if (!entry) continue;
-
-    entry.total_points += sc.points;
-    if (sc.tier === "exact") {
-      entry.exacts_total += 1;
-      if (KNOCKOUT_STAGES.has(sc.stage)) entry.exacts_knockout += 1;
-    }
-    if (sc.tier !== "miss") entry.winner_or_draw_total += 1;
-    if (sc.stage === "final") entry.final_points += sc.points;
-    if (SEMI_THIRD_FINAL.has(sc.stage)) entry.semi_third_final_points += sc.points;
+    applyScoreToEntry(entry, { points: sc.points, tier: sc.tier, stage: sc.stage });
   }
 
   const sorted = [...init.values()].sort(compareForRanking);

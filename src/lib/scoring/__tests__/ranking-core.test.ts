@@ -3,6 +3,7 @@ import {
   aggregate,
   compareForRanking,
   assignRanks,
+  applyScoreToEntry,
   type ProfileRow,
   type ScoreWithStageRow,
   type RankingEntry,
@@ -128,5 +129,40 @@ describe("assignRanks", () => {
     ]);
     expect(r[0].exacts_total).toBe(2);
     expect(r[0].exacts_knockout).toBe(1);
+  });
+});
+
+describe("applyScoreToEntry", () => {
+  it("exact em mata-mata soma pontos, exacts_total, exacts_knockout e winner_or_draw_total", () => {
+    const e = baseEntry();
+    applyScoreToEntry(e, { points: 13, tier: "exact", stage: "round_of_16" });
+    expect(e.total_points).toBe(13);
+    expect(e.exacts_total).toBe(1);
+    expect(e.exacts_knockout).toBe(1);
+    expect(e.winner_or_draw_total).toBe(1);
+  });
+
+  it("exact na fase de grupos não conta exacts_knockout", () => {
+    const e = baseEntry();
+    applyScoreToEntry(e, { points: 7, tier: "exact", stage: "group" });
+    expect(e.exacts_total).toBe(1);
+    expect(e.exacts_knockout).toBe(0);
+  });
+
+  it("miss não incrementa winner_or_draw_total", () => {
+    const e = baseEntry();
+    applyScoreToEntry(e, { points: 0, tier: "miss", stage: "group" });
+    expect(e.winner_or_draw_total).toBe(0);
+    expect(e.total_points).toBe(0);
+  });
+
+  it("final e semi alimentam final_points e semi_third_final_points", () => {
+    const e = baseEntry();
+    applyScoreToEntry(e, { points: 34, tier: "exact", stage: "final" });
+    expect(e.final_points).toBe(34);
+    expect(e.semi_third_final_points).toBe(34);
+    applyScoreToEntry(e, { points: 25, tier: "exact", stage: "semi" });
+    expect(e.final_points).toBe(34);
+    expect(e.semi_third_final_points).toBe(34 + 25);
   });
 });
