@@ -19,17 +19,14 @@ export default async function MatchDetailPage({
     notFound();
   }
 
+  const isValidStatus =
+    match.status !== "cancelled" && match.status !== "postponed";
+
   const hasResult =
-    match.home_score !== null &&
-    match.away_score !== null &&
-    match.status !== "cancelled" &&
-    match.status !== "postponed";
+    match.home_score !== null && match.away_score !== null && isValidStatus;
 
   const canSimulate =
-    match.home_score === null &&
-    match.away_score === null &&
-    match.status !== "cancelled" &&
-    match.status !== "postponed";
+    match.home_score === null && match.away_score === null && isValidStatus;
 
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-10">
