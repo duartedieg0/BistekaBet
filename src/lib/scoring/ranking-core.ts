@@ -62,7 +62,7 @@ export function assignRanks(sorted: RankingEntry[]): RankingRow[] {
 
 export function applyScoreToEntry(
   entry: RankingEntry,
-  input: { points: number; tier: Tier; stage: Stage },
+  input: Pick<ScoreWithStageRow, "points" | "tier" | "stage">,
 ): void {
   const { points, tier, stage } = input;
   entry.total_points += points;
