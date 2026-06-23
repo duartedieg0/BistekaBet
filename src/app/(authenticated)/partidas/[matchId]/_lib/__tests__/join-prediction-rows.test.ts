@@ -96,4 +96,11 @@ describe("joinPredictionRows", () => {
     });
     expect(rows.map((r) => r.user_id)).toEqual(["u1", "u2", "u3"]);
   });
+
+  it("embute o entry (RankingRow de origem) em cada linha", () => {
+    const rows = joinPredictionRows({ ranking, predictions: [], scores: [] });
+    expect(rows[0].entry).toEqual(ranking[0]);
+    expect(rows[1].entry.user_id).toBe("u2");
+    expect(rows[2].entry.total_points).toBe(0);
+  });
 });

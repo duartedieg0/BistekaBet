@@ -21,6 +21,7 @@ export type MatchPredictionRow = {
   rank: number;
   prediction: { home_score: number; away_score: number } | null;
   score: PredictionScore | null;
+  entry: RankingRow;
 };
 
 export function joinPredictionRows(input: {
@@ -45,6 +46,7 @@ export function joinPredictionRows(input: {
       rank: r.rank,
       prediction: pred ? { home_score: pred.home_score, away_score: pred.away_score } : null,
       score: scoreByUser.get(r.user_id) ?? null,
+      entry: r,
     };
   });
 }
