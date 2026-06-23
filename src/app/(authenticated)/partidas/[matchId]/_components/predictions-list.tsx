@@ -7,18 +7,31 @@ import { PredictionRow } from "./prediction-row";
 import { NoPredictionSection } from "./no-prediction-section";
 import { filterByName } from "../_lib/search-filter";
 import type { MatchPredictionRow } from "../_lib/join-prediction-rows";
+import type { SimulatedRow } from "@/lib/scoring/simulate";
 
 type Props = {
   rows: MatchPredictionRow[];
   showPoints: boolean;
+  simulation?: Map<string, SimulatedRow> | null;
 };
 
-export function PredictionsList({ rows, showPoints }: Props) {
+export function PredictionsList({ rows, showPoints, simulation = null }: Props) {
   const [query, setQuery] = useState("");
+  const simulating = simulation !== null;
 
   const filtered = useMemo(() => filterByName(rows, query), [rows, query]);
-  const withPrediction = filtered.filter((r) => r.prediction !== null);
-  const withoutPrediction = filtered.filter((r) => r.prediction === null);
+
+  const sortBySim = (list: MatchPredictionRow[]) =>
+    simulation
+      ? [...list].sort(
+          (a, b) =>
+            (simulation.get(a.user_id)?.rank ?? Number.POSITIVE_INFINITY) -
+            (simulation.get(b.user_id)?.rank ?? Number.POSITIVE_INFINITY),
+        )
+      : list;
+
+  const withPrediction = sortBySim(filtered.filter((r) => r.prediction !== null));
+  const withoutPrediction = sortBySim(filtered.filter((r) => r.prediction === null));
 
   const noResults = query.trim() !== "" && filtered.length === 0;
 
@@ -49,15 +62,21 @@ export function PredictionsList({ rows, showPoints }: Props) {
           {withPrediction.length > 0 ? (
             <div className="rounded-md border">
               <div className="flex items-center gap-3 border-b bg-muted/50 px-2 py-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-                <span className="w-8 text-right">#</span>
+                <span className="w-14 text-right">#</span>
                 <span className="size-7 shrink-0" aria-hidden />
                 <span className="min-w-0 flex-1">Participante</span>
                 <span className="w-16 text-right">Palpite</span>
-                {showPoints ? <span className="w-12 text-right">Pts</span> : null}
+                {showPoints || simulating ? <span className="w-12 text-right">Pts</span> : null}
+                {simulating ? <span className="w-16 text-right">Total</span> : null}
               </div>
               <ul>
                 {withPrediction.map((row) => (
-                  <PredictionRow key={row.user_id} row={row} showPoints={showPoints} />
+                  <PredictionRow
+                    key={row.user_id}
+                    row={row}
+                    showPoints={showPoints}
+                    sim={simulation?.get(row.user_id) ?? null}
+                  />
                 ))}
               </ul>
             </div>
@@ -67,7 +86,7 @@ export function PredictionsList({ rows, showPoints }: Props) {
             </p>
           )}
 
-          <NoPredictionSection rows={withoutPrediction} />
+          <NoPredictionSection rows={withoutPrediction} simulation={simulation} />
         </>
       )}
     </div>
