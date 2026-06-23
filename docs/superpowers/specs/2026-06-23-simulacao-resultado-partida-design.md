@@ -117,9 +117,21 @@ src/app/(authenticated)/partidas/[matchId]/
   _components/
     match-simulator.tsx            # novo: Client wrapper, dono do estado da simulação
     simulation-controls.tsx        # novo: campos numéricos + Simular/Limpar
-    predictions-list.tsx           # editado: props de simulação, reordenação, colunas
+    predictions-list.tsx           # editado: props de simulação, reordenação, colunas, header
     prediction-row.tsx             # editado: colunas Pts/Total + seta de variação
+    no-prediction-section.tsx      # editado: repassa simulação (rank/seta/Total) às linhas
 ```
+
+Todos os pontos são **inteiros** — `score()` devolve pontos inteiros e os totais
+são somas de inteiros. Pts e Total não precisam de formatação decimal.
+
+Durante a simulação, o **cabeçalho** da lista ("com palpite") passa a exibir os
+rótulos das novas colunas (**Pts** e **Total**), além do já existente. Hoje o
+header só renderiza "Pts" condicionalmente (`showPoints`); a mesma lógica se
+estende para incluir "Total" quando simulando.
+
+Os campos do painel são rotulados pelos **nomes dos times** (mandante /
+visitante), reaproveitando os dados já disponíveis em `MatchHeader`.
 
 ### Helper compartilhado (refator de apoio)
 
