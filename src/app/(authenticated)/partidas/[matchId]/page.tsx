@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getMatchPredictions } from "./_lib/get-match-predictions";
 import { MatchHeader } from "./_components/match-header";
 import { PredictionsList } from "./_components/predictions-list";
+import { MatchSimulator } from "./_components/match-simulator";
 
 export default async function MatchDetailPage({
   params,
@@ -24,10 +25,25 @@ export default async function MatchDetailPage({
     match.status !== "cancelled" &&
     match.status !== "postponed";
 
+  const canSimulate =
+    match.home_score === null &&
+    match.away_score === null &&
+    match.status !== "cancelled" &&
+    match.status !== "postponed";
+
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-10">
       <MatchHeader match={match} />
-      <PredictionsList rows={predictions} showPoints={hasResult} />
+      {canSimulate ? (
+        <MatchSimulator
+          rows={predictions}
+          stage={match.stage}
+          homeName={match.home_team?.name ?? "Mandante"}
+          awayName={match.away_team?.name ?? "Visitante"}
+        />
+      ) : (
+        <PredictionsList rows={predictions} showPoints={hasResult} />
+      )}
     </main>
   );
 }
