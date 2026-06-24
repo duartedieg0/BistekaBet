@@ -61,13 +61,13 @@ export function PredictionsList({ rows, showPoints, simulation = null }: Props) 
         <>
           {withPrediction.length > 0 ? (
             <div className="rounded-md border">
-              <div className="flex items-center gap-3 border-b bg-muted/50 px-2 py-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-                <span className="w-14 text-right">#</span>
+              <div className="flex items-center gap-2 border-b bg-muted/50 px-2 py-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+                <span className="w-12 text-right">#</span>
                 <span className="size-7 shrink-0" aria-hidden />
                 <span className="min-w-0 flex-1">Participante</span>
                 <span className="w-16 text-right">Palpite</span>
-                {showPoints || simulating ? <span className="w-12 text-right">Pts</span> : null}
-                <span className="w-16 text-right">Total</span>
+                {showPoints || simulating ? <span className="w-10 text-right">Pts</span> : null}
+                <span className="w-12 text-right">Total</span>
               </div>
               <ul>
                 {withPrediction.map((row) => (

@@ -17,8 +17,8 @@ export function PredictionRow({ row, showPoints, sim = null }: Props) {
   const showPts = showPoints || sim !== null;
 
   return (
-    <li className="flex items-center gap-3 border-b px-2 py-2 last:border-b-0">
-      <span className="flex w-14 items-center justify-end gap-0.5 font-semibold tabular-nums text-muted-foreground">
+    <li className="flex items-center gap-2 border-b px-2 py-2 last:border-b-0">
+      <span className="flex w-12 items-center justify-end gap-0.5 font-semibold tabular-nums text-muted-foreground">
         {sim && sim.delta > 0 ? (
           <span
             className="inline-flex items-center text-[10px] font-medium text-emerald-600"
@@ -61,7 +61,7 @@ export function PredictionRow({ row, showPoints, sim = null }: Props) {
 
       {showPts ? (
         <span
-          className="w-12 text-right tabular-nums text-sm"
+          className="w-10 text-right tabular-nums text-sm"
           aria-label={
             sim
               ? sim.points === null
@@ -75,7 +75,7 @@ export function PredictionRow({ row, showPoints, sim = null }: Props) {
       ) : null}
 
       <span
-        className="w-16 text-right tabular-nums text-sm font-semibold"
+        className="w-12 text-right tabular-nums text-sm font-semibold"
         aria-label={`total ${sim ? sim.total : row.entry.total_points} pontos`}
       >
         {sim ? sim.total : row.entry.total_points}
