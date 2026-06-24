@@ -74,14 +74,12 @@ export function PredictionRow({ row, showPoints, sim = null }: Props) {
         </span>
       ) : null}
 
-      {sim ? (
-        <span
-          className="w-16 text-right tabular-nums text-sm font-semibold"
-          aria-label={`total ${sim.total} pontos`}
-        >
-          {sim.total}
-        </span>
-      ) : null}
+      <span
+        className="w-16 text-right tabular-nums text-sm font-semibold"
+        aria-label={`total ${sim ? sim.total : row.entry.total_points} pontos`}
+      >
+        {sim ? sim.total : row.entry.total_points}
+      </span>
     </li>
   );
 }

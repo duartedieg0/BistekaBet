@@ -42,13 +42,15 @@ oficial, e ela some ao limpar.
 
 | Estado | Pts | Total | Reordena + setas | Painel de simulação |
 |---|---|---|---|---|
-| Resultado oficial | oficial desta partida | — (oculta) | não (lista estática) | oculto |
-| Aguardando, sem simular | — (oculta) | — (oculta) | não | visível |
+| Resultado oficial | oficial desta partida | total atual | não (lista estática) | oculto |
+| Aguardando, sem simular | — (oculta) | total atual | não | visível |
 | Aguardando, **simulando** | simulado desta partida | total + simulação | sim | visível (+ Limpar) |
 
 A coluna **Pts** aparece quando há **resultado oficial** OU **simulação ativa**.
-A coluna **Total** aparece **apenas durante a simulação**. Ambas são numéricas,
-alinhadas à direita, com `tabular-nums`.
+A coluna **Total** está **sempre visível**: mostra o total atual do participante
+no bolão (`entry.total_points`) e, quando a simulação está ativa, reflete o total
+já com os pontos simulados. Ambas são numéricas, alinhadas à direita, com
+`tabular-nums`.
 
 ### Painel "Simular resultado"
 
@@ -262,8 +264,10 @@ page.tsx (server) ── canSimulate, stage, rows(+entry) ──▶ MatchSimulat
   modesto.
 - **Helper `applyScoreToEntry` compartilhado**: fonte única da regra de
   acumulação; o rank simulado nunca diverge do oficial.
-- **Coluna Total só na simulação**: mantém a lista enxuta no estado normal; o
-  total ganha relevância justamente quando há um "e se?" para comparar.
+- **Coluna Total sempre visível**: dá sentido numérico ao rank em qualquer
+  estado da página (o total atual já vem em `entry.total_points` em cada linha) e
+  evita que a coluna apareça/suma ao simular. Quando a simulação está ativa, o
+  valor passa a refletir os pontos simulados.
 - **Reordenar + seta**: a lista vira a classificação simulada, e a seta torna
   legível o impacto do resultado na posição de cada um.
 - **Sem persistência/URL**: simulação é exploratória e efêmera; persistir

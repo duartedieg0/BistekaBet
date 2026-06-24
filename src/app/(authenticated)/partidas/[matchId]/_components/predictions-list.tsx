@@ -67,7 +67,7 @@ export function PredictionsList({ rows, showPoints, simulation = null }: Props) 
                 <span className="min-w-0 flex-1">Participante</span>
                 <span className="w-16 text-right">Palpite</span>
                 {showPoints || simulating ? <span className="w-12 text-right">Pts</span> : null}
-                {simulating ? <span className="w-16 text-right">Total</span> : null}
+                <span className="w-16 text-right">Total</span>
               </div>
               <ul>
                 {withPrediction.map((row) => (
