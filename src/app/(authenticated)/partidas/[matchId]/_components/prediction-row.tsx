@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUp } from "lucide-react";
+import { VariationArrow } from "@/components/variation-arrow";
 import { getInitials } from "@/app/(authenticated)/_components/avatar-fallback";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
@@ -19,23 +19,7 @@ export function PredictionRow({ row, showPoints, sim = null }: Props) {
   return (
     <li className="flex items-center gap-2 border-b px-2 py-2 last:border-b-0">
       <span className="flex w-12 items-center justify-end gap-0.5 font-semibold tabular-nums text-muted-foreground">
-        {sim && sim.delta > 0 ? (
-          <span
-            className="inline-flex items-center text-[10px] font-medium text-emerald-600"
-            aria-label={`subiu ${sim.delta} posições`}
-          >
-            <ArrowUp className="size-3" aria-hidden />
-            {sim.delta}
-          </span>
-        ) : sim && sim.delta < 0 ? (
-          <span
-            className="inline-flex items-center text-[10px] font-medium text-red-600"
-            aria-label={`desceu ${-sim.delta} posições`}
-          >
-            <ArrowDown className="size-3" aria-hidden />
-            {-sim.delta}
-          </span>
-        ) : null}
+        {sim ? <VariationArrow delta={sim.delta} /> : null}
         <span>{rank}</span>
       </span>
 
