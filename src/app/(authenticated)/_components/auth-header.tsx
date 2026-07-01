@@ -22,6 +22,7 @@ const NAV = [
   { href: "/inicio", label: "Início" },
   { href: "/palpites", label: "Palpites" },
   { href: "/classificacao", label: "Ranking" },
+  { href: "/raio-x", label: "Raio-X" },
   { href: "/regulamento", label: "Regulamento" },
 ];
 

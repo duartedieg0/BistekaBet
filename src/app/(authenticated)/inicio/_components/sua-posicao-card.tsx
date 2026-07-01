@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { Target, Trophy } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/server";
@@ -47,6 +48,12 @@ export async function SuaPosicaoCard() {
             ranking.
           </span>
         )}
+        <Link
+          href="/raio-x"
+          className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+        >
+          Ver meu raio-x →
+        </Link>
       </CardContent>
     </Card>
   );

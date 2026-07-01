@@ -39,6 +39,7 @@ function ChartTooltip({
 
 export function RankTimelineChart({ timeline }: { timeline: TimelinePoint[] }) {
   const [mounted, setMounted] = useState(false);
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- hydration guard
   useEffect(() => setMounted(true), []);
 
   const ranks = timeline.map((t) => t.rank);
