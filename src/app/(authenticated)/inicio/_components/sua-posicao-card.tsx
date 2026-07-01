@@ -48,12 +48,14 @@ export async function SuaPosicaoCard() {
             ranking.
           </span>
         )}
-        <Link
-          href="/raio-x"
-          className="text-sm font-medium text-primary underline-offset-4 hover:underline"
-        >
-          Ver meu raio-x →
-        </Link>
+        {hasPalpitado && (
+          <Link
+            href="/raio-x"
+            className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+          >
+            Ver meu raio-x →
+          </Link>
+        )}
       </CardContent>
     </Card>
   );

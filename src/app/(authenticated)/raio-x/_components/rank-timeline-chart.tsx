@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import {
   CartesianGrid,
   Line,
@@ -12,6 +12,16 @@ import {
 } from "recharts";
 import { formatDayDdMm } from "@/lib/dates/sao-paulo-day";
 import type { TimelinePoint } from "@/lib/scoring/raio-x-core";
+
+// Detecta hidratação sem setState-em-effect: falso no SSR, verdadeiro no cliente.
+const noopSubscribe = () => () => {};
+function useHydrated() {
+  return useSyncExternalStore(
+    noopSubscribe,
+    () => true,
+    () => false,
+  );
+}
 
 function ChartTooltip({
   active,
@@ -38,9 +48,7 @@ function ChartTooltip({
 }
 
 export function RankTimelineChart({ timeline }: { timeline: TimelinePoint[] }) {
-  const [mounted, setMounted] = useState(false);
-  // eslint-disable-next-line react-hooks/set-state-in-effect -- hydration guard
-  useEffect(() => setMounted(true), []);
+  const mounted = useHydrated();
 
   const ranks = timeline.map((t) => t.rank);
   const minRank = Math.min(...ranks);
