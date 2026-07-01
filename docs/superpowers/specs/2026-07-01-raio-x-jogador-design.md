@@ -32,6 +32,20 @@ jobs/triggers de snapshot.
 - O rank diário considera **todos os profiles** (mesma base do `loadRanking`), pra
   bater exatamente com a Classificação.
 
+### Regra de "tem dados" (`hasData`)
+
+Espelha o `hasPalpitado` do `SuaPosicaoCard`: **`hasData = totalPoints > 0`** — o
+usuário tem pelo menos um `prediction_score`. Uma única regra cobre os dois casos
+sem dados: **pré-Copa** (nenhum resultado saiu → 0 pontos) e **usuário que ainda
+não pontuou** (Copa em andamento, mas ele sem pontos).
+
+O **eixo X** do gráfico e da tabela são **todos os dias com jogos encerrados
+globalmente** (a "linha do tempo da Copa, desde o início"), independentemente de o
+usuário ter palpitado naquele dia. Antes do primeiro ponto do usuário, sua linha
+aparece no fim da tabela (empatado em 0 com os demais) — honesto e informativo
+("entrou na disputa no dia X"). O rank de cada dia sempre considera todos os
+profiles.
+
 ### Fora de escopo (YAGNI)
 
 - Raio-X de outros jogadores (`/raio-x/[userId]`), comparação com líder/média,
@@ -67,7 +81,13 @@ a versão exata é validada na instalação.
 
 ### Estrutura de arquivos
 
+**Dependência nova:** instalar **recharts** (v3) — passo explícito do plano
+(`package.json` ainda não tem chart lib).
+
 ```
+src/lib/dates/
+  sao-paulo-day.ts                 # editado: exportar helper saoPauloDay(iso)
+
 src/lib/scoring/
   raio-x-core.ts                   # novo: buildRaioXTimeline (função pura)
   raio-x.ts                        # novo: loadRaioX (server-only, queries)
@@ -110,8 +130,11 @@ Reaproveita `applyScoreToEntry` / `compareForRanking` / `assignRanks` do
 Classificação (sem divergência).
 
 Entrada normalizada — `scores[]` com `{ user_id, points, tier, stage, day }`, onde
-`day` = dia São Paulo (`YYYY-MM-DD`) do `kickoff_at`, derivado com o padrão do
-`sao-paulo-day.ts` (fuso `America/Sao_Paulo`).
+`day` = dia São Paulo (`YYYY-MM-DD`) do `kickoff_at`. **Adicionar um helper
+exportado** `saoPauloDay(iso: string): string` ao `sao-paulo-day.ts` (o
+`saoPauloYmd` atual é privado). ⚠️ **Não usar** `new Date(iso).toISOString()
+.slice(0,10)` — isso bucketiza por UTC e quebra o caso da meia-noite. O helper usa
+o mesmo fuso fixo `America/Sao_Paulo` (UTC-3) do arquivo.
 
 Algoritmo:
 
@@ -134,8 +157,9 @@ type TimelinePoint = {
   day: string;              // YYYY-MM-DD (dia São Paulo)
   rank: number;
   cumulativePoints: number;
-  pointsThatDay: number;
-  matchesThatDay: number;
+  pointsThatDay: number;    // pontos do usuário nesse dia
+  matchesThatDay: number;   // qtd de prediction_scores DO USUÁRIO nesse dia
+                            //   (bate com "Pts dia"; não é o total de jogos do dia)
   delta: number;            // rank anterior - rank do dia (dia 1 = 0)
 };
 
@@ -166,9 +190,10 @@ do `SuaPosicaoCard`.
 | Um único dia | ponto isolado (dot) | normais | uma linha, `delta` neutro |
 | Normal (N dias) | linha completa | normais | N linhas |
 
-**Estado vazio:** card único com copy no espírito do `SuaPosicaoCard` — *"Seu
-raio-x aparece quando os primeiros resultados saírem"*. Cobre pré-Copa e usuário
-que ainda não pontuou.
+**Estado vazio** (`hasData=false`, ver "Regra de tem dados"): card único com copy
+no espírito do `SuaPosicaoCard` — *"Você ainda não pontuou. Seu raio-x aparece
+assim que você somar os primeiros pontos."* Cobre com um só texto tanto pré-Copa
+quanto usuário que ainda não pontuou.
 
 ### Componentes e UI
 
@@ -197,7 +222,8 @@ que ainda não pontuou.
 
 **`DailyTable` — server, `Table` (shadcn) no estilo do `RankingTable`**
 
-- Colunas: **Dia** · **Jogos** · **Pts dia** · **Posição** · **Var.**
+- Colunas: **Dia** · **Jogos** (qtd de palpites pontuados do usuário no dia =
+  `matchesThatDay`) · **Pts dia** · **Posição** · **Var.**
 - **Var.** com seta colorida: ↑ verde (subiu), ↓ vermelho (caiu), – neutro (dia 1
   / sem mudança), reaproveitando a lógica de seta da lista de palpites simulada.
 - Densidade mobile no padrão dos commits recentes (colunas apertadas,
@@ -216,8 +242,8 @@ demais páginas.
 
 ## Casos de borda
 
-- **Sem scores** (usuário sem palpites ou Copa sem resultados): `hasData=false` →
-  estado vazio.
+- **Sem pontos do usuário** (pré-Copa ou usuário que não pontuou): `hasData=false`
+  → estado vazio (ver "Regra de tem dados"; `hasData = totalPoints > 0`).
 - **Empates de rank:** mesmos critérios de desempate do `ranking-core` (total →
   exatos → exatos mata-mata → winner_or_draw → final → semi/3º/final).
 - **Dia 1:** `delta = 0` (sem "ontem"); seta neutra.
@@ -245,6 +271,9 @@ do diretório):
 - `hasData=false` quando não há scores.
 - Highlights: `bestRank`, `biggestClimb` e respectivas datas corretas.
 - Bucketização por dia São Paulo (jogo perto da meia-noite no dia certo).
+- **Invariantes:** `timeline[último].rank === highlights.currentRank`;
+  `highlights.bestRank === min(timeline[].rank)`;
+  `highlights.totalPoints === timeline[último].cumulativePoints`.
 
 A ilha do recharts e as queries `server-only` **não** entram em teste unitário
 (dependem de browser/Supabase); o valor de teste está no core puro.
