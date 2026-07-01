@@ -5,6 +5,8 @@ import {
   formatKickoff,
   toSaoPauloInputValue,
   fromSaoPauloInputValue,
+  saoPauloDay,
+  formatDayDdMm,
 } from "@/lib/dates/sao-paulo-day";
 
 describe("saoPauloDayRange", () => {
@@ -96,5 +98,24 @@ describe("fromSaoPauloInputValue", () => {
     for (const iso of samples) {
       expect(fromSaoPauloInputValue(toSaoPauloInputValue(iso))).toBe(iso);
     }
+  });
+});
+
+describe("saoPauloDay", () => {
+  it("jogo de dia cai no dia São Paulo correto", () => {
+    expect(saoPauloDay("2026-06-11T19:00:00Z")).toBe("2026-06-11");
+  });
+  it("antes da meia-noite SP fica no dia anterior ao UTC", () => {
+    expect(saoPauloDay("2026-06-12T02:00:00Z")).toBe("2026-06-11");
+  });
+  it("meia-noite SP vira o dia seguinte", () => {
+    expect(saoPauloDay("2026-06-12T03:00:00Z")).toBe("2026-06-12");
+  });
+});
+
+describe("formatDayDdMm", () => {
+  it("formata YYYY-MM-DD como dd/mm", () => {
+    expect(formatDayDdMm("2026-06-11")).toBe("11/06");
+    expect(formatDayDdMm("2026-07-01")).toBe("01/07");
   });
 });

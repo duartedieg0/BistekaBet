@@ -59,6 +59,17 @@ export function toSaoPauloInputValue(iso: string): string {
   return `${get("year")}-${get("month")}-${get("day")}T${get("hour")}:${get("minute")}`;
 }
 
+/** Dia calendário São Paulo (YYYY-MM-DD) de um ISO timestamp. */
+export function saoPauloDay(iso: string): string {
+  return toSaoPauloInputValue(iso).slice(0, 10);
+}
+
+/** Formata um dia calendário "YYYY-MM-DD" como "dd/mm" (sem conversão de fuso). */
+export function formatDayDdMm(day: string): string {
+  const [, m, d] = day.split("-");
+  return `${d}/${m}`;
+}
+
 export function formatKickoff(iso: string): string {
   const date = new Date(iso);
   const parts = new Intl.DateTimeFormat("pt-BR", {
