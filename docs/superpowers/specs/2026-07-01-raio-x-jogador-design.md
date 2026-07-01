@@ -35,7 +35,8 @@ jobs/triggers de snapshot.
 ### Regra de "tem dados" (`hasData`)
 
 Espelha o `hasPalpitado` do `SuaPosicaoCard`: **`hasData = totalPoints > 0`** — o
-usuário tem pelo menos um `prediction_score`. Uma única regra cobre os dois casos
+usuário somou pelo menos um ponto (um usuário com só erros tem `prediction_score`
+mas `totalPoints = 0`, então `hasData = false`). Uma única regra cobre os dois casos
 sem dados: **pré-Copa** (nenhum resultado saiu → 0 pontos) e **usuário que ainda
 não pontuou** (Copa em andamento, mas ele sem pontos).
 
@@ -136,10 +137,22 @@ exportado** `saoPauloDay(iso: string): string` ao `sao-paulo-day.ts` (o
 .slice(0,10)` — isso bucketiza por UTC e quebra o caso da meia-noite. O helper usa
 o mesmo fuso fixo `America/Sao_Paulo` (UTC-3) do arquivo.
 
+Assinatura:
+
+```ts
+function buildRaioXTimeline(input: {
+  userId: string;
+  profiles: ProfileRow[];
+  scores: { user_id: string; points: number; tier: Tier; stage: Stage; day: string }[];
+}): RaioXResult;
+```
+
 Algoritmo:
 
 1. Coleta os **dias distintos** presentes nos scores, em ordem crescente — esse é
-   o eixo X (só dias com jogos encerrados aparecem).
+   o eixo X. Definição literal: **dias presentes nos `prediction_scores`** (uma
+   partida encerrada em que ninguém palpitou não gera score, logo não vira dia — é
+   irrelevante no bolão).
 2. Para cada dia `D`, **acumulado**: agrega todos os scores com `day ≤ D`,
    ranqueia todos os profiles, lê a linha do `userId`.
 3. Monta o ponto do dia: `{ day, rank, cumulativePoints, pointsThatDay,
@@ -169,7 +182,7 @@ type RaioXResult = {
     currentRank: number;
     totalPlayers: number;
     bestRank: number;       bestRankDay: string;
-    biggestClimb: number;   biggestClimbDay: string;
+    biggestClimb: number;   biggestClimbDay: string | null;  // floor em 0; null se nunca subiu
     totalPoints: number;
     exactsTotal: number;
   };
