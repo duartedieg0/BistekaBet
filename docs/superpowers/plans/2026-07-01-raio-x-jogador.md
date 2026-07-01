@@ -26,7 +26,7 @@
 - `src/components/variation-arrow.tsx` — componente de seta ↑/↓ compartilhado.
 
 **Modificar:**
-- `src/lib/dates/sao-paulo-day.ts` — exportar helper `saoPauloDay(iso)`.
+- `src/lib/dates/sao-paulo-day.ts` — exportar helpers `saoPauloDay(iso)` e `formatDayDdMm(day)`.
 - `src/lib/dates/__tests__/sao-paulo-day.test.ts` — testes do novo helper.
 - `src/app/(authenticated)/partidas/[matchId]/_components/prediction-row.tsx` — usar `VariationArrow` (remove duplicação).
 - `src/app/(authenticated)/_components/auth-header.tsx` — novo item no array `NAV`.
@@ -42,9 +42,9 @@
 
 ---
 
-## Task 1: Helper `saoPauloDay(iso)` (TDD)
+## Task 1: Helpers de data `saoPauloDay` e `formatDayDdMm` (TDD)
 
-Deriva o dia calendário São Paulo (`YYYY-MM-DD`) de um ISO timestamp, reusando o formatador já testado. **Não** usar `new Date(iso).toISOString().slice(0,10)` (bucketiza por UTC e quebra a meia-noite).
+`saoPauloDay(iso)` deriva o dia calendário São Paulo (`YYYY-MM-DD`) de um ISO timestamp, reusando o formatador já testado. **Não** usar `new Date(iso).toISOString().slice(0,10)` (bucketiza por UTC e quebra a meia-noite). `formatDayDdMm(day)` formata um `YYYY-MM-DD` como `dd/mm` (usado por gráfico, cards e tabela — evita duplicação em 3 componentes).
 
 **Files:**
 - Modify: `src/lib/dates/sao-paulo-day.ts`
@@ -75,6 +75,15 @@ describe("saoPauloDay", () => {
     expect(saoPauloDay("2026-06-12T03:00:00Z")).toBe("2026-06-12");
   });
 });
+
+import { formatDayDdMm } from "@/lib/dates/sao-paulo-day";
+
+describe("formatDayDdMm", () => {
+  it("formata YYYY-MM-DD como dd/mm", () => {
+    expect(formatDayDdMm("2026-06-11")).toBe("11/06");
+    expect(formatDayDdMm("2026-07-01")).toBe("01/07");
+  });
+});
 ```
 
 - [ ] **Step 2: Rodar e ver falhar**
@@ -91,6 +100,12 @@ Adicionar ao `src/lib/dates/sao-paulo-day.ts` (pode ficar após `toSaoPauloInput
 export function saoPauloDay(iso: string): string {
   return toSaoPauloInputValue(iso).slice(0, 10);
 }
+
+/** Formata um dia calendário "YYYY-MM-DD" como "dd/mm" (sem conversão de fuso). */
+export function formatDayDdMm(day: string): string {
+  const [, m, d] = day.split("-");
+  return `${d}/${m}`;
+}
 ```
 
 - [ ] **Step 4: Rodar e ver passar**
@@ -102,7 +117,7 @@ Expected: PASS (todos, incluindo os pré-existentes).
 
 ```bash
 git add src/lib/dates/sao-paulo-day.ts src/lib/dates/__tests__/sao-paulo-day.test.ts
-git commit -m "feat(dates): helper saoPauloDay para dia calendario SP"
+git commit -m "feat(dates): helpers saoPauloDay e formatDayDdMm"
 ```
 
 ---
@@ -363,7 +378,10 @@ export function buildRaioXTimeline(input: {
   const exactsTotal = myEntry?.exacts_total ?? 0;
   const last = timeline[timeline.length - 1];
 
-  let bestRank = last ? last.rank : totalPlayers;
+  // Seed com Infinity para a PRIMEIRA ocorrência do menor rank vencer (o loop só
+  // atualiza em melhora estrita). bestRankDay="" só é alcançável com timeline
+  // vazia, e nesse caso hasData=false (a página nem lê highlights).
+  let bestRank = timeline.length ? Infinity : totalPlayers;
   let bestRankDay = last ? last.day : "";
   let biggestClimb = 0;
   let biggestClimbDay: string | null = null;
@@ -613,12 +631,8 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { formatDayDdMm } from "@/lib/dates/sao-paulo-day";
 import type { TimelinePoint } from "@/lib/scoring/raio-x-core";
-
-function ddmm(day: string): string {
-  const [, m, d] = day.split("-");
-  return `${d}/${m}`;
-}
 
 function ChartTooltip({
   active,
@@ -631,7 +645,7 @@ function ChartTooltip({
   const p = payload[0].payload;
   return (
     <div className="rounded-md border bg-popover px-3 py-2 text-xs text-popover-foreground shadow-md">
-      <div className="font-semibold">{ddmm(p.day)}</div>
+      <div className="font-semibold">{formatDayDdMm(p.day)}</div>
       <div>Posição: #{p.rank}</div>
       <div>Pontos no dia: {p.pointsThatDay}</div>
       <div>Total: {p.cumulativePoints}</div>
@@ -665,7 +679,7 @@ export function RankTimelineChart({ timeline }: { timeline: TimelinePoint[] }) {
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
             <XAxis
               dataKey="day"
-              tickFormatter={ddmm}
+              tickFormatter={formatDayDdMm}
               tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
               minTickGap={16}
               tickMargin={8}
@@ -725,12 +739,8 @@ Criar `src/app/(authenticated)/raio-x/_components/highlight-cards.tsx`:
 ```tsx
 import { ArrowUp, Crosshair, Star, Target, Trophy } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { formatDayDdMm } from "@/lib/dates/sao-paulo-day";
 import type { RaioXHighlights } from "@/lib/scoring/raio-x-core";
-
-function ddmm(day: string): string {
-  const [, m, d] = day.split("-");
-  return `${d}/${m}`;
-}
 
 function Stat({
   icon,
@@ -765,12 +775,12 @@ export function HighlightCards({ highlights: h }: { highlights: RaioXHighlights 
       <Stat
         icon={<Star className="size-4 text-primary" aria-hidden />}
         value={`#${h.bestRank}`}
-        label={`Melhor posição · ${ddmm(h.bestRankDay)}`}
+        label={`Melhor posição · ${formatDayDdMm(h.bestRankDay)}`}
       />
       <Stat
         icon={<ArrowUp className="size-4 text-emerald-600" aria-hidden />}
         value={h.biggestClimbDay ? `+${h.biggestClimb}` : "—"}
-        label={h.biggestClimbDay ? `Maior subida · ${ddmm(h.biggestClimbDay)}` : "Maior subida"}
+        label={h.biggestClimbDay ? `Maior subida · ${formatDayDdMm(h.biggestClimbDay)}` : "Maior subida"}
       />
       <Stat
         icon={<Crosshair className="size-4 text-primary" aria-hidden />}
@@ -824,12 +834,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { VariationArrow } from "@/components/variation-arrow";
+import { formatDayDdMm } from "@/lib/dates/sao-paulo-day";
 import type { TimelinePoint } from "@/lib/scoring/raio-x-core";
-
-function ddmm(day: string): string {
-  const [, m, d] = day.split("-");
-  return `${d}/${m}`;
-}
 
 export function DailyTable({ timeline }: { timeline: TimelinePoint[] }) {
   const rows = [...timeline].reverse(); // mais recente no topo
@@ -848,7 +854,7 @@ export function DailyTable({ timeline }: { timeline: TimelinePoint[] }) {
       <TableBody>
         {rows.map((r) => (
           <TableRow key={r.day}>
-            <TableCell className="font-medium">{ddmm(r.day)}</TableCell>
+            <TableCell className="font-medium">{formatDayDdMm(r.day)}</TableCell>
             <TableCell className="text-right tabular-nums">{r.matchesThatDay}</TableCell>
             <TableCell className="text-right tabular-nums">{r.pointsThatDay}</TableCell>
             <TableCell className="text-right tabular-nums font-semibold">#{r.rank}</TableCell>
@@ -1081,7 +1087,7 @@ git commit -m "fix(raio-x): ajustes da verificacao manual"
 
 ## Notas de implementação
 
-- **DRY:** o rank diário reusa `applyScoreToEntry`/`compareForRanking`/`assignRanks` — nunca diverge da Classificação. A seta de variação é o `VariationArrow` compartilhado.
+- **DRY:** o rank diário reusa `applyScoreToEntry`/`compareForRanking`/`assignRanks` — nunca diverge da Classificação. A seta de variação é o `VariationArrow` compartilhado, e o formato `dd/mm` é o `formatDayDdMm` (único, no módulo de datas).
 - **Sem teste de componente/recharts:** segue o padrão do repo — a lógica testável mora no core puro (`raio-x-core.ts`). Componentes são validados por typecheck/lint/build + checagem manual.
 - **Cores por token** (`var(--chart-1)`, `var(--border)`, `var(--muted-foreground)`): funcionam em dark/light sem hardcode (tokens são oklch cru em `globals.css`).
 - **`hasData = totalPoints > 0`** espelha o `hasPalpitado` do `SuaPosicaoCard`; cobre pré-Copa e usuário sem pontos com um único caminho.
