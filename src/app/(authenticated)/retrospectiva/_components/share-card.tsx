@@ -96,36 +96,39 @@ export function ShareCard({ persona, journey, zebra, user }: ShareCardProps) {
       />
 
       <div className="relative flex h-full flex-col px-12 pb-11 pt-14">
-        {/* 1. Header / lockup de marcas (Patota Bistekas × Equipe Coringas, como na hero) */}
-        <header className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
+        {/* 1. Header: texto à esquerda; lockup de marcas (mascote + Coringas, proporção da hero) no canto superior direito */}
+        <header className="flex items-start justify-between gap-4">
+          <div className="flex flex-col pt-1">
+            <span className="font-heading text-[30px] uppercase leading-none tracking-tight">
+              Bisteka<span style={{ color: GOLD }}>Bet</span>
+            </span>
+            <span
+              className="mt-2 text-[13px] font-semibold uppercase tracking-[0.28em]"
+              style={{ color: GOLD }}
+            >
+              Retrospectiva Copa 2026
+            </span>
+          </div>
+          {/* Mascote grande + Coringas ~52% sobreposto no canto inferior direito (igual à hero) */}
+          <div className="relative shrink-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/BISTECA.png"
               alt=""
               aria-hidden
-              className="h-16 w-auto object-contain"
-              style={{ filter: "drop-shadow(0 6px 10px rgba(33,26,23,0.5))" }}
+              className="h-32 w-auto object-contain"
+              style={{ filter: "drop-shadow(0 12px 18px rgba(33,26,23,0.55))" }}
             />
-            <span className="font-heading text-[30px] uppercase leading-none tracking-tight">
-              Bisteka<span style={{ color: GOLD }}>Bet</span>
-            </span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo_coringas.png"
+              alt=""
+              aria-hidden
+              className="absolute -bottom-1 -right-2 h-auto w-[52%] object-contain"
+              style={{ filter: "drop-shadow(0 10px 14px rgba(33,26,23,0.55))" }}
+            />
           </div>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/logo_coringas.png"
-            alt=""
-            aria-hidden
-            className="h-16 w-auto object-contain"
-            style={{ filter: "drop-shadow(0 6px 10px rgba(33,26,23,0.5))" }}
-          />
         </header>
-        <span
-          className="mt-2 text-[13px] font-semibold uppercase tracking-[0.32em]"
-          style={{ color: GOLD }}
-        >
-          Retrospectiva Copa 2026
-        </span>
 
         {/* 2. Usuario */}
         <div className="mt-8 flex items-center gap-4">
