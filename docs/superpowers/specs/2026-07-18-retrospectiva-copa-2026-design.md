@@ -264,9 +264,13 @@ do snapshot). Conteúdo:
   `navigator.share` (abre a folha de compartilhamento do sistema — IG, WhatsApp
   etc.); senão, cai no download.
 - **Preparação anti-CORS** antes do snapshot: **bandeiras via SVG local** (nada de
-  URL externa no card), e **avatar inlinado** como data-URL (`fetch` → `FileReader`)
-  no server ou antes do render; se falhar, usa iniciais. Fontes web precisam estar
-  carregadas antes do primeiro snapshot (garantir via `document.fonts.ready`).
+  URL externa no card), e **avatar inlinado como data-URL no server** —
+  `loadRetrospectiva` faz `fetch` do `avatar_url` e converte para data-URL,
+  passando-o como prop já embutida ao `ShareCard` (o card nunca referencia URL
+  externa); se o fetch falhar, `avatarDataUrl = null` e o card usa **iniciais**.
+  Assim a ilha client não precisa buscar nada antes do snapshot. Fontes web
+  precisam estar carregadas antes do primeiro snapshot (garantir via
+  `document.fonts.ready`).
 - **Aviso honesto** na UI: a web não posta direto no Stories; o fluxo é
   baixar/compartilhar e subir manualmente no Instagram.
 - Estados de UI: idle → "gerando…" (durante o `toPng`) → sucesso/erro (via `sonner`,
