@@ -96,17 +96,29 @@ export function ShareCard({ persona, journey, zebra, user }: ShareCardProps) {
       />
 
       <div className="relative flex h-full flex-col px-12 pb-11 pt-14">
-        {/* 1. Header / wordmark */}
-        <header className="flex items-center justify-between">
-          <span className="font-heading text-[30px] uppercase leading-none tracking-tight">
-            Bisteka<span style={{ color: GOLD }}>Bet</span>
-          </span>
-          <span
-            className="text-[13px] font-bold uppercase tracking-[0.22em]"
-            style={{ color: "rgba(251,248,243,0.7)" }}
-          >
-            Retrô
-          </span>
+        {/* 1. Header / lockup de marcas (Patota Bistekas × Equipe Coringas, como na hero) */}
+        <header className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/BISTECA.png"
+              alt=""
+              aria-hidden
+              className="h-16 w-auto object-contain"
+              style={{ filter: "drop-shadow(0 6px 10px rgba(33,26,23,0.5))" }}
+            />
+            <span className="font-heading text-[30px] uppercase leading-none tracking-tight">
+              Bisteka<span style={{ color: GOLD }}>Bet</span>
+            </span>
+          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo_coringas.png"
+            alt=""
+            aria-hidden
+            className="h-16 w-auto object-contain"
+            style={{ filter: "drop-shadow(0 6px 10px rgba(33,26,23,0.5))" }}
+          />
         </header>
         <span
           className="mt-2 text-[13px] font-semibold uppercase tracking-[0.32em]"
