@@ -77,9 +77,33 @@ Copy da despedida (Brasil/Hexa) — rascunho a validar:
 
 - [ ] **Step 3: Registrar as decisões**
 
-Anotar os valores finais confirmados (numa nota no topo do plano ou como comentário). **Esses são os números usados nas Tasks 3–5.** Se um valor mudar depois, ajustar a constante — os testes são escritos contra as constantes (não contra literais), então continuam válidos.
+### ✅ CALIBRAÇÃO TRAVADA (dados reais: 37 jogadores pontuando, 3.645 palpites)
 
-**Sem commit** (nenhuma mudança de código). Prosseguir só após o "ok" do autor.
+Perfil real observado: na mosca — mediana 10, p90 **13**, máx 17; taxa de acerto — máx **66%**;
+"zebra-prone" não discrimina (min 21/jogador — quase todo jogo é sem seleção grande).
+
+**Decisões do autor:**
+- **🦓 "Amante da Zebra" REMOVIDA como persona.** O conceito de zebra fica **apenas no
+  destaque narrativo** ("Sua zebra"). Consequência no código: `personas.ts` **não** tem
+  regra de zebra; `PersonaSignals` **não** tem `zebraHits`; `buildRetrospectiva` não recebe
+  `zebraHits`. `pickZebra`/`isZebraProne` continuam (Task 4) — usados só pela narrativa.
+- **Limiares finais** (`PERSONA_THRESHOLDS`):
+
+  | Constante | Valor travado |
+  |---|---|
+  | `podioMaxRank` | 3 |
+  | `cravadorMinExacts` | **13** |
+  | `videnteMinScored` / `videnteMinRate` | 20 / **0.62** |
+  | `escaladorMinClimb` | 10 |
+  | `montanhaRussaMinVolatility` | 20 |
+
+- **Lista "grandes" (zebra):** `BRA, ARG, FRA, ESP, GER, POR, NED, ENG`.
+- **Copy da despedida (travada):**
+  > "Que jornada, hein? Foram 39 dias torcendo juntos — até por Jordânia × Argélia. Obrigado por viver a Copa com a gente. Que na próxima o Brasil venha mais competitivo e traga o Hexa. 🇧🇷"
+
+**Ordem final das personas:** 👑 Pódio → 🎯 Cravador → 🔮 Vidente → 🧗 Escalador → 🎢 Montanha-Russa → 🇧🇷 Fiel (fallback).
+
+**Sem commit** (nenhuma mudança de código nesta task). As Tasks 3–6 abaixo já refletem estes valores.
 
 ---
 
@@ -134,7 +158,6 @@ const base: PersonaSignals = {
   predictionsScored: 0,
   firstRank: 50,
   rankVolatility: 0,
-  zebraHits: 0,
 };
 
 describe("derivePersona", () => {
@@ -144,10 +167,6 @@ describe("derivePersona", () => {
 
   it("Cravador quando tem muitas na mosca", () => {
     expect(derivePersona({ ...base, exactsTotal: T.cravadorMinExacts }).key).toBe("cravador");
-  });
-
-  it("Amante da Zebra quando crava jogos improváveis", () => {
-    expect(derivePersona({ ...base, zebraHits: T.zebraMinHits }).key).toBe("zebra");
   });
 
   it("Vidente com alta taxa de acerto e amostra suficiente", () => {
@@ -201,7 +220,7 @@ Expected: FAIL (módulo `@/lib/retro/personas` não existe).
 ```ts
 // src/lib/retro/personas.ts
 export type PersonaKey =
-  | "podio" | "cravador" | "zebra" | "vidente"
+  | "podio" | "cravador" | "vidente"
   | "escalador" | "montanha_russa" | "fiel";
 
 export type PersonaSignals = {
@@ -214,7 +233,6 @@ export type PersonaSignals = {
   predictionsScored: number;   // total de prediction_scores do usuário
   firstRank: number;           // rank no 1º dia pontuado
   rankVolatility: number;      // soma dos |delta| ao longo da timeline
-  zebraHits: number;
 };
 
 export type Persona = {
@@ -229,10 +247,9 @@ export type Persona = {
 // então ajustar um valor aqui NÃO quebra os testes.
 export const PERSONA_THRESHOLDS = {
   podioMaxRank: 3,
-  cravadorMinExacts: 6,
-  zebraMinHits: 2,
+  cravadorMinExacts: 13,
   videnteMinScored: 20,
-  videnteMinRate: 0.65,
+  videnteMinRate: 0.62,
   escaladorMinClimb: 10,
   montanhaRussaMinVolatility: 20,
 } as const;
@@ -260,14 +277,6 @@ const RULES: Rule[] = [
       key: "cravador", title: "O Cravador", emoji: "🎯",
       subtitle: "Placar exato é com você mesmo.",
       reason: `Você cravou ${s.exactsTotal} placares na mosca.`,
-    }),
-  },
-  {
-    matches: (s) => s.zebraHits >= PERSONA_THRESHOLDS.zebraMinHits,
-    build: (s) => ({
-      key: "zebra", title: "Amante da Zebra", emoji: "🦓",
-      subtitle: "Você viu craque onde ninguém apostava.",
-      reason: `Acertou ${s.zebraHits} jogos que quase ninguém arriscou.`,
     }),
   },
   {
@@ -468,7 +477,7 @@ describe("buildRetrospectiva", () => {
         biggestClimb: 4, biggestClimbDay: "2026-06-20", totalPoints: 120, exactsTotal: 8,
       },
       timeline: tl([0, 2, -1, 3]),
-      exactsKnockout: 2, winnerOrDrawTotal: 30, predictionsScored: 40, zebraHits: 3,
+      exactsKnockout: 2, winnerOrDrawTotal: 30, predictionsScored: 40,
       zebra: null,
       collective: { players: 50, predictions: 2000, exacts: 300, matches: 104, days: 39 },
       hasData: true,
@@ -485,7 +494,7 @@ describe("buildRetrospectiva", () => {
         biggestClimb: 0, biggestClimbDay: null, totalPoints: 0, exactsTotal: 0,
       },
       timeline: [], exactsKnockout: 0, winnerOrDrawTotal: 0, predictionsScored: 0,
-      zebraHits: 0, zebra: null,
+      zebra: null,
       collective: { players: 50, predictions: 2000, exacts: 300, matches: 104, days: 39 },
       hasData: false,
     });
@@ -536,7 +545,6 @@ export function buildRetrospectiva(input: {
   exactsKnockout: number;
   winnerOrDrawTotal: number;
   predictionsScored: number;
-  zebraHits: number;
   zebra: ZebraCandidate | null;
   collective: CollectiveStats;
   hasData: boolean;
@@ -554,14 +562,13 @@ export function buildRetrospectiva(input: {
     predictionsScored: input.predictionsScored,
     firstRank,
     rankVolatility: rankVolatility(timeline),
-    zebraHits: input.zebraHits,
   };
 
   // Sem dados: nunca uma persona competitiva. Força o fallback carinhoso.
   const persona = hasData
     ? derivePersona(signals)
     : derivePersona({ ...signals, currentRank: h.totalPlayers, exactsTotal: 0,
-        zebraHits: 0, predictionsScored: 0, rankVolatility: 0, firstRank: h.totalPlayers });
+        predictionsScored: 0, rankVolatility: 0, firstRank: h.totalPlayers });
 
   return {
     persona,
@@ -612,7 +619,7 @@ import { createClient } from "@/lib/supabase/server";
 import { loadRaioX } from "@/lib/scoring/raio-x";
 import { COMPETITION } from "@/lib/bolao-config";
 import {
-  pickZebra, isZebraProne, buildRetrospectiva,
+  pickZebra, buildRetrospectiva,
   type ZebraCandidate, type Retrospectiva,
 } from "./retro-core";
 
@@ -677,9 +684,6 @@ export async function loadRetrospectiva(userId: string): Promise<RetrospectivaVi
     tier: r.tier, points: r.points,
   }));
   const zebra = pickZebra(zebraCandidates);
-  const zebraHits = zebraCandidates.filter(
-    (z) => z.tier !== "miss" && isZebraProne(z.homeCode, z.awayCode),
-  ).length;
 
   const retro = buildRetrospectiva({
     highlights: raioX.highlights,
@@ -687,7 +691,6 @@ export async function loadRetrospectiva(userId: string): Promise<RetrospectivaVi
     exactsKnockout,
     winnerOrDrawTotal,
     predictionsScored,
-    zebraHits,
     zebra,
     collective: {
       players: playersCount.count ?? 0,
