@@ -3,6 +3,7 @@ import { RankingPreview } from "./_components/ranking-preview";
 import { UpcomingMatchesSection } from "./_components/upcoming-matches-section";
 import { SuaPosicaoCard } from "./_components/sua-posicao-card";
 import { AvisosCard } from "./_components/avisos-card";
+import { RetroBanner } from "./_components/retro-banner";
 
 export default function InicioPage() {
   return (
@@ -20,6 +21,8 @@ export default function InicioPage() {
           </p>
         </div>
       </header>
+
+      <RetroBanner />
 
       <section className="grid gap-5 lg:grid-cols-[2fr_1fr]">
         <UpcomingMatchesSection />

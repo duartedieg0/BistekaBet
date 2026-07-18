@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { loadRaioX } from "@/lib/scoring/raio-x";
@@ -27,6 +28,12 @@ export default async function RaioXPage() {
         <p className="text-muted-foreground">
           Sua trajetória de posição e pontos ao longo da Copa.
         </p>
+        <Link
+          href="/retrospectiva"
+          className="mt-1 inline-flex w-fit items-center gap-1 text-sm font-medium text-primary hover:underline"
+        >
+          Veja sua Retrospectiva completa →
+        </Link>
       </header>
 
       {data.hasData ? (
