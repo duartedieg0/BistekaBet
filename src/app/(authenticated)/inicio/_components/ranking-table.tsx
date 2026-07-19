@@ -9,12 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { RankingRow } from "@/lib/scoring/ranking-core";
-
-const MEDAL_COLORS: Record<number, string> = {
-  1: "text-yellow-500",
-  2: "text-gray-400",
-  3: "text-amber-700",
-};
+import { MEDAL_COLORS } from "@/lib/scoring/medal";
 
 function RankCell({ rank }: { rank: number }) {
   const color = MEDAL_COLORS[rank];
