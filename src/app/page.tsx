@@ -7,6 +7,8 @@ import { Faq } from "./_components/landing/faq";
 import { FinalCta } from "./_components/landing/final-cta";
 import { LandingFooter } from "./_components/landing-footer";
 import { LandingNav } from "./_components/landing-nav";
+import { getAppSettingAdmin } from "@/lib/app-settings";
+import { LandingEncerramento } from "./_components/landing/encerramento/landing-encerramento";
 
 const ERROR_MESSAGES: Record<string, string> = {
   auth: "Não foi possível concluir o login. Tente novamente.",
@@ -27,6 +29,20 @@ export default async function Home({
 
   const { error } = await searchParams;
   const errorMessage = error ? ERROR_MESSAGES[error] : null;
+
+  const copaEncerrada = await getAppSettingAdmin<boolean>(
+    "copa_encerrada",
+    false,
+  );
+  if (copaEncerrada) {
+    return (
+      <>
+        <LandingNav />
+        <LandingEncerramento errorMessage={errorMessage} />
+        <LandingFooter />
+      </>
+    );
+  }
 
   return (
     <>
