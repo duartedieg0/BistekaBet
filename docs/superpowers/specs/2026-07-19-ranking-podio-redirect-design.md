@@ -90,6 +90,12 @@ export async function isFinalDecided(): Promise<boolean> {
 > próprias. Confirmar o import de `redirect` e o padrão de página `async` nos docs
 > em `node_modules/next/dist/docs/` antes de codar.
 
+> Invariante: existe exatamente **uma** partida `stage='final'` (seed 005,
+> `bracket_position 1`). `.maybeSingle()` lança (popula `error`) se houver mais de
+> uma — o que degrada para `false` (não redireciona). Isso é o comportamento
+> **intencional**: "múltiplas finais → sem redirect" sinaliza problema de dado.
+> **Não** mascarar com `.limit(1)`.
+
 ### 4.2 Redirect em `/inicio` (`src/app/(authenticated)/inicio/page.tsx`)
 
 `InicioPage` passa de `function` para `async function`. Primeira instrução do
@@ -112,6 +118,9 @@ Antes da final, o comportamento é idêntico ao atual (o predicado retorna `fals
   secundário.
 - 1º recebe realce extra (anel/pedestal dourado, avatar maior).
 - Colocação exibida a partir de `row.rank` (empates aparecem honestamente — ver §6).
+- **Mobile:** com 3 colunas estreitas e nomes longos, tratar truncamento
+  explicitamente (`min-w-0` no container flex + `truncate` no nome) para o nome não
+  estourar a coluna. É o ponto de maior risco de layout.
 
 ### 4.4 Lista (`src/app/(authenticated)/classificacao/_components/ranking-list.tsx`) — novo
 
@@ -180,11 +189,15 @@ Em staging: preencher o vencedor da final (`winner_team_id`) →
 ## 6. Riscos e questões em aberto
 
 1. **Empates na fronteira do pódio.** `assignRanks` dá a mesma `rank` a empatados
-   (ex.: dois "1º", próximo é "3º"; ou dois "3º"). O pódio pega `rows.slice(0,3)`
-   por posição e exibe `row.rank`, então um empate aparece honestamente (dois "1º").
-   Num empate de dois no 3º, a lista pode começar mostrando um "3º". Aceito como
-   caso raro (há 6 níveis de desempate em `compareForRanking`) e honesto; o
-   destaque continua seguindo `rank <= 10`.
+   (ex.: dois "1º", próximo é "3º"; ou dois "3º"). Comportamento concreto **fixado**
+   (slice por índice + exibir `row.rank`):
+   - Dois empatados no 1º → pódio mostra dois cards "1º" (posições 2ª e 1ª do layout)
+     e um "3º"; lista começa no 4º.
+   - Dois empatados no 3º → pódio mostra "1º", "2º" e **um** "3º" (o `rows[2]`); o
+     outro empatado no 3º é `rows[3]`, então **a lista começa exibindo um segundo
+     "3º"** e o destaque `rank <= 10` o inclui. É proposital e honesto.
+
+   Aceito como caso raro (há 6 níveis de desempate em `compareForRanking`).
 2. **Menos de 3 participantes.** Pódio renderiza só os cards existentes; lista pode
    ficar vazia; `rows.length === 0` cai no estado vazio. Cenário improvável quando a
    final já foi decidida, mas tratado defensivamente.
