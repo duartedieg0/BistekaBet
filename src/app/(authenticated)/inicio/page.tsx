@@ -1,11 +1,14 @@
-import { Badge } from "@/components/ui/badge";
+import { redirect } from "next/navigation";
 import { RankingPreview } from "./_components/ranking-preview";
 import { UpcomingMatchesSection } from "./_components/upcoming-matches-section";
 import { SuaPosicaoCard } from "./_components/sua-posicao-card";
 import { AvisosCard } from "./_components/avisos-card";
 import { RetroBanner } from "./_components/retro-banner";
+import { isFinalDecided } from "@/lib/matches/final-status";
 
-export default function InicioPage() {
+export default async function InicioPage() {
+  if (await isFinalDecided()) redirect("/classificacao");
+
   return (
     <main className="mx-auto w-full max-w-7xl flex-1 px-6 py-10">
       <header className="flex flex-wrap items-end justify-between gap-4 pb-8">
