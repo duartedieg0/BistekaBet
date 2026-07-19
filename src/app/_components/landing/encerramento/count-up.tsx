@@ -26,8 +26,8 @@ export function CountUp({
       "(prefers-reduced-motion: reduce)",
     ).matches;
     if (prefersReduced) {
-      setDisplay(value);
-      return;
+      const raf = requestAnimationFrame(() => setDisplay(value));
+      return () => cancelAnimationFrame(raf);
     }
 
     const io = new IntersectionObserver(
