@@ -130,8 +130,11 @@ home pública passam por `createAdminClient()` (service-role, server-only):
   para uma função interna que recebe o client Supabase; `loadRanking()` chama com
   `await createClient()` (mantém `/classificacao` intacto) e `loadPublicRanking()`
   chama com `createAdminClient()`. Zero mudança na agregação.
-- `loadCollectiveStats()` usa `createAdminClient()` internamente (contagens globais,
-  não sensíveis; serve tanto a home pública quanto o `/retrospectiva`).
+- `loadCollectiveStats(): Promise<{ players; predictions; exacts }>` usa
+  `createAdminClient()` internamente (contagens globais, não sensíveis; serve tanto
+  a home pública quanto o `/retrospectiva`). O número de **dias** fica a cargo do
+  chamador (home = intervalo da competição ~39, Q5; retro = `timeline.length || 39`),
+  pois o significado difere por contexto.
 - `getAppSettingAdmin<T>(key, fallback)` em `app-settings.ts`: variante de
   `getAppSetting` que usa `createAdminClient()`, para a leitura da flag na home.
 
