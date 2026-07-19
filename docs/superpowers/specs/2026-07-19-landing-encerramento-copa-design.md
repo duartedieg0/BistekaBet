@@ -47,7 +47,7 @@ Mantém a linguagem de marca do Hero atual, **incluindo os dois logos** (mascote
 | Q3 | Foco no pódio; sem premiação em R$ | Escolha do usuário. Evita expor valores em página pública. |
 | Q4 | Retrospectiva coletiva "essencial": só dados já calculados | Escolha do usuário. Imersão vem do design, não de novas queries. |
 | Q5 | "Dias de bolão" = intervalo da competição (~39 dias) | Zero-query; já é o fallback no código. Escolha do usuário sobre "dias distintos com jogo". |
-| Q6 | Se o RLS bloquear leitura anônima, montar o ranking público via **service-role** | Escolha do usuário. Só expõe dados que já são ranking público (nome, avatar, pontos). Decisão final depende de verificar o RLS na implementação. |
+| Q6 | Home pública lê **flag + ranking + stats via service-role** (`createAdminClient`) | RLS **confirmado** (grep em `supabase/sql/`): `profiles`, `prediction_scores`, `matches` e `app_settings` só têm SELECT `to authenticated`; visitante anônimo não lê **nada**, inclusive a própria flag. Service-role (server-only) é o caminho definitivo; só expõe ranking já público. Escolha do usuário. |
 | Q7 | Sem bloco de Patrocínio | Escolha do usuário (cortar o `Sponsors` da landing de encerramento). |
 | Q8 | Switch de admin direto, sem diálogo de confirmação | Consistência com o toggle do convite. Escolha do usuário. |
 | Q9 | Comemoração "contida e sofisticada": spotlight + shimmer + count-up, sem confete | Escolha do usuário. On-brand ("sangue no olho"), leve e performático. |
@@ -81,11 +81,16 @@ Espelha o par do convite de evento.
 
 ```
 user? → redirect("/inicio")            // inalterado
-copaEncerrada = getAppSetting("copa_encerrada", false)
+copaEncerrada = getAppSettingAdmin("copa_encerrada", false)   // service-role (Q6)
 copaEncerrada
   ├─ true  → <LandingEncerramento />   // + LandingNav/LandingFooter
   └─ false → landing atual (Hero/HowItWorks/Sponsors/Faq/FinalCta)  // inalterada
 ```
+
+> A leitura da flag na home usa **service-role** (`getAppSettingAdmin`), não o
+> `getAppSetting` anônimo — senão o RLS de `app_settings` (só `authenticated`)
+> devolveria sempre o fallback `false` e a landing nunca trocaria (Q6). O
+> `admin/page.tsx` continua usando `getAppSetting` normal (contexto autenticado).
 
 `errorMessage` (erros de auth via `searchParams`) continua sendo tratado; na
 landing de encerramento é repassado ao Hero de coroação para exibição do alerta.
@@ -117,21 +122,27 @@ teste importar só o puro sem esbarrar em `server-only`.
 `loadCollectiveStats()` em vez de repetir as três contagens inline. Mantém o
 comportamento atual do `/retrospectiva`.
 
-**Leitura pública (Q6):** a home é renderizada para visitante anônimo, então o
-Supabase server client usa a chave `anon`. **Passo de verificação na
-implementação:** confirmar se há política RLS de `SELECT` anônimo em `profiles`,
-`prediction_scores`, `matches`. Se **sim**, `loadRanking()`/`loadCollectiveStats()`
-funcionam direto. Se **não**, adicionar variantes que usam `createAdminClient()`
-(service-role) apenas para montar esses dados públicos (`loadPublicRanking()` /
-stats via admin), sem expor nada além do ranking já público. A escolha entre os
-dois caminhos não muda o design das seções.
+**Leitura pública via service-role (Q6, confirmado):** como não há SELECT anônimo
+em `profiles`/`prediction_scores`/`matches`/`app_settings`, todas as leituras da
+home pública passam por `createAdminClient()` (service-role, server-only):
+
+- `loadPublicRanking()` em `ranking.ts`: refatorar o corpo atual de `loadRanking`
+  para uma função interna que recebe o client Supabase; `loadRanking()` chama com
+  `await createClient()` (mantém `/classificacao` intacto) e `loadPublicRanking()`
+  chama com `createAdminClient()`. Zero mudança na agregação.
+- `loadCollectiveStats()` usa `createAdminClient()` internamente (contagens globais,
+  não sensíveis; serve tanto a home pública quanto o `/retrospectiva`).
+- `getAppSettingAdmin<T>(key, fallback)` em `app-settings.ts`: variante de
+  `getAppSetting` que usa `createAdminClient()`, para a leitura da flag na home.
+
+Nada além de nome/avatar/pontos (já públicos no ranking) é exposto.
 
 ### 4.4 Componente orquestrador (`landing-encerramento.tsx`, novo, server)
 
 `src/app/_components/landing/encerramento/landing-encerramento.tsx`
 
-Server component. Busca dados (`loadRanking()` + `loadCollectiveStats()` em
-paralelo) e compõe as seções na ordem:
+Server component. Busca dados (`loadPublicRanking()` + `loadCollectiveStats()` em
+paralelo — ambos service-role, Q6) e compõe as seções na ordem:
 
 ```
 ① <ChampionHero champions={pickChampions(rows)} errorMessage={…} />
@@ -216,9 +227,11 @@ Em staging, com resultados registrados:
 
 ## 6. Riscos e questões em aberto
 
-1. **RLS para leitura anônima.** É a maior incógnita de implementação (Q6). Se as
-   tabelas não permitem `SELECT` anônimo, o caminho service-role resolve; a
-   verificação é o primeiro passo do plano.
+1. **RLS para leitura anônima (resolvido).** Confirmado que não há SELECT anônimo
+   em `profiles`/`prediction_scores`/`matches`/`app_settings`; a home pública lê
+   flag + ranking + stats via service-role (Q6). Risco residual: garantir que
+   `SUPABASE_SERVICE_ROLE_KEY` está disponível no ambiente de produção que
+   renderiza `/` (já é usado nos server actions de import, então deve estar).
 2. **Empate no 1º lugar.** `assignRanks` dá `rank: 1` a todos os empatados.
    `pickChampions` devolve todos; o Hero exibe co-campeões lado a lado. O pódio
    (`rows.slice(0,3)`) e a lista seguem a mesma lógica honesta já usada em
