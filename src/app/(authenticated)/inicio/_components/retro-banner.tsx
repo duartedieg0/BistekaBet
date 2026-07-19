@@ -13,7 +13,7 @@ export function RetroBanner() {
         </span>
         <div className="flex flex-col">
           <span className="font-heading text-xl uppercase tracking-tight">
-            Sua Copa acabou — veja sua Retrospectiva
+            A Copa acabou — veja sua Retrospectiva
           </span>
           <span className="text-sm text-muted-foreground">
             Sua jornada, sua persona e um card pra compartilhar. 🇧🇷
