@@ -1,5 +1,7 @@
 import "server-only";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { paginateAll } from "@/lib/supabase/paginate";
 import {
   aggregate,
@@ -15,9 +17,7 @@ type ScoreJoinRow = {
   matches: { stage: string } | { stage: string }[];
 };
 
-export async function loadRanking(): Promise<RankingRow[]> {
-  const supabase = await createClient();
-
+async function loadRankingWith(supabase: SupabaseClient): Promise<RankingRow[]> {
   const [profilesQ, scoreRows] = await Promise.all([
     supabase.from("profiles").select("id, display_name, avatar_url, paid"),
     paginateAll<ScoreJoinRow>(async (from, to) => {
@@ -45,4 +45,17 @@ export async function loadRanking(): Promise<RankingRow[]> {
   });
 
   return aggregate(profiles, scores);
+}
+
+export async function loadRanking(): Promise<RankingRow[]> {
+  return loadRankingWith((await createClient()) as unknown as SupabaseClient);
+}
+
+/**
+ * Ranking para a home pública (visitante anônimo). Usa service-role porque o RLS
+ * de `profiles`/`prediction_scores` é só `authenticated`. Expõe apenas dados já
+ * públicos do ranking (nome, avatar, pontos).
+ */
+export async function loadPublicRanking(): Promise<RankingRow[]> {
+  return loadRankingWith(createAdminClient() as unknown as SupabaseClient);
 }
