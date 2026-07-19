@@ -8,6 +8,7 @@ import {
   type ZebraCandidate,
   type Retrospectiva,
 } from "./retro-core";
+import { loadCollectiveStats } from "@/lib/scoring/collective";
 
 export type RetrospectivaView = Retrospectiva & {
   user: { displayName: string; avatarDataUrl: string | null };
@@ -46,35 +47,22 @@ export async function loadRetrospectiva(
 
   const raioX = await loadRaioX(userId); // timeline + highlights + hasData
 
-  const [profile, playersCount, predsCount, groupExactsCount, userScores] =
-    await Promise.all([
-      supabase
-        .from("profiles")
-        .select("display_name, avatar_url")
-        .eq("id", userId)
-        .single(),
-      supabase
-        .from("profiles")
-        .select("id", { count: "exact", head: true }),
-      supabase
-        .from("predictions")
-        .select("id", { count: "exact", head: true }),
-      supabase
-        .from("prediction_scores")
-        .select("prediction_id", { count: "exact", head: true })
-        .eq("tier", "exact"),
-      supabase
-        .from("prediction_scores")
-        .select(
-          "points, tier, matches!inner(home_team:home_team_id(code,name), away_team:away_team_id(code,name))",
-        )
-        .eq("user_id", userId),
-    ]);
+  const [profile, userScores, counts] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("display_name, avatar_url")
+      .eq("id", userId)
+      .single(),
+    supabase
+      .from("prediction_scores")
+      .select(
+        "points, tier, matches!inner(home_team:home_team_id(code,name), away_team:away_team_id(code,name))",
+      )
+      .eq("user_id", userId),
+    loadCollectiveStats(),
+  ]);
 
   if (profile.error) throw profile.error;
-  if (playersCount.error) throw playersCount.error;
-  if (predsCount.error) throw predsCount.error;
-  if (groupExactsCount.error) throw groupExactsCount.error;
   if (userScores.error) throw userScores.error;
 
   const rows = (userScores.data ?? []) as unknown as ScoreRow[];
@@ -114,9 +102,9 @@ export async function loadRetrospectiva(
     predictionsScored,
     zebra,
     collective: {
-      players: playersCount.count ?? 0,
-      predictions: predsCount.count ?? 0,
-      exacts: groupExactsCount.count ?? 0,
+      players: counts.players,
+      predictions: counts.predictions,
+      exacts: counts.exacts,
       matches: COMPETITION.totalMatches,
       days: raioX.timeline.length || 39,
     },
