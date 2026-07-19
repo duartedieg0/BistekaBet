@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Medal } from "lucide-react";
 import {
   Table,
@@ -10,6 +9,7 @@ import {
 } from "@/components/ui/table";
 import type { RankingRow } from "@/lib/scoring/ranking-core";
 import { MEDAL_COLORS } from "@/lib/scoring/medal";
+import { PremiacaoNote } from "@/app/(authenticated)/_components/premiacao-note";
 
 function RankCell({ rank }: { rank: number }) {
   const color = MEDAL_COLORS[rank];
@@ -62,16 +62,7 @@ export function RankingTable({ rows }: { rows: RankingRow[] }) {
           ))}
         </TableBody>
       </Table>
-      <p className="mt-3 text-xs text-muted-foreground">
-        Top 3 levam uma camisa da Seleção Brasileira.{" "}
-        <Link
-          href="/regulamento#premiacao"
-          className="underline hover:text-foreground"
-        >
-          Ver premiação no regulamento
-        </Link>
-        .
-      </p>
+      <PremiacaoNote className="mt-3" />
     </>
   );
 }
