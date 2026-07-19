@@ -41,6 +41,7 @@ export async function recomputeAllScores(): Promise<{
   }
 
   revalidatePath("/admin");
+  revalidatePath("/");
   revalidatePath("/inicio");
   revalidatePath("/classificacao");
   revalidatePath("/palpites");
@@ -183,6 +184,7 @@ export async function commitImport(entries: DiffEntry[]): Promise<CommitImportRe
 
     revalidatePath("/admin");
     revalidatePath("/admin/partidas");
+    revalidatePath("/");
     revalidatePath("/inicio");
     revalidatePath("/classificacao");
     revalidatePath("/palpites");
@@ -191,6 +193,35 @@ export async function commitImport(entries: DiffEntry[]): Promise<CommitImportRe
   } catch (err) {
     console.error("commitImport failed", err);
     return { ok: false, error: err instanceof Error ? err.message : "unknown" };
+  }
+}
+
+export async function setCopaEncerrada(
+  enabled: boolean,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return { ok: false, error: "unauthenticated" };
+
+    const { data: isAdmin, error: rpcError } = await supabase.rpc("is_admin", {
+      uid: user.id,
+    });
+    if (rpcError) return { ok: false, error: rpcError.message };
+    if (!isAdmin) return { ok: false, error: "forbidden" };
+
+    await setAppSetting<boolean>("copa_encerrada", enabled);
+
+    revalidatePath("/");
+    revalidatePath("/admin");
+    return { ok: true };
+  } catch (err) {
+    return {
+      ok: false,
+      error: err instanceof Error ? err.message : "unknown",
+    };
   }
 }
 

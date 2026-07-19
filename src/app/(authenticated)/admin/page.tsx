@@ -4,6 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { RecomputeScoresCard } from "./_components/recompute-scores-card";
 import { ImportResultsCard } from "./_components/import-results-card";
 import { EventInviteToggleCard } from "./_components/event-invite-toggle-card";
+import { CopaEncerradaToggleCard } from "./_components/copa-encerrada-toggle-card";
 import { getAppSetting } from "@/lib/app-settings";
 
 export default async function AdminPage() {
@@ -11,6 +12,7 @@ export default async function AdminPage() {
     "event_invite_enabled",
     false,
   );
+  const copaEncerrada = await getAppSetting<boolean>("copa_encerrada", false);
   return (
     <>
       <header className="flex flex-col gap-1 pb-8">
@@ -49,6 +51,7 @@ export default async function AdminPage() {
         <RecomputeScoresCard />
         <ImportResultsCard />
         <EventInviteToggleCard defaultEnabled={eventInviteEnabled} />
+        <CopaEncerradaToggleCard defaultEnabled={copaEncerrada} />
       </section>
     </>
   );
