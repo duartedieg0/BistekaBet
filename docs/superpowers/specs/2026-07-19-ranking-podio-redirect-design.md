@@ -52,23 +52,27 @@ E um comportamento de "grande final":
 
 ## 4. Arquitetura
 
-### 4.1 Detecção da final (`src/lib/matches/final-status.ts`) — novo
+### 4.1 Detecção da final — dois arquivos (split IO/puro)
 
-`server-only`. Split IO/puro, seguindo a convenção do projeto:
+Segue a convenção do repo (`ranking-core.ts` puro vs `ranking.ts` server-only), pra
+o teste importar só o puro sem esbarrar em `server-only`.
 
-- **Puro** — `finalDecidedFromRow(row: { winner_team_id: string | null } | null): boolean`
-  → `true` sse `row?.winner_team_id != null`. Unit-testável sem Supabase.
-- **IO** — `isFinalDecided(): Promise<boolean>`:
+**`src/lib/matches/final-status-core.ts` (puro, sem `server-only`):**
 
 ```ts
-import "server-only";
-import { createClient } from "@/lib/supabase/server";
-
 export function finalDecidedFromRow(
   row: { winner_team_id: string | null } | null,
 ): boolean {
   return row?.winner_team_id != null;
 }
+```
+
+**`src/lib/matches/final-status.ts` (`server-only`, IO):**
+
+```ts
+import "server-only";
+import { createClient } from "@/lib/supabase/server";
+import { finalDecidedFromRow } from "./final-status-core";
 
 export async function isFinalDecided(): Promise<boolean> {
   try {
@@ -167,8 +171,8 @@ rows = await loadRanking()
 
 Seguindo a convenção do repo (funções puras em vitest; sem testes de componente).
 
-- **`src/lib/matches/__tests__/final-status.test.ts`** — novo. Cobre
-  `finalDecidedFromRow`:
+- **`src/lib/matches/__tests__/final-status-core.test.ts`** — novo. Importa só o
+  módulo puro (`final-status-core.ts`) e cobre `finalDecidedFromRow`:
   - `null` → `false` (sem partida final encontrada).
   - `{ winner_team_id: null }` → `false` (final ainda sem vencedor).
   - `{ winner_team_id: "<uuid>" }` → `true` (final decidida).
